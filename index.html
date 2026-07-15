@@ -143,7 +143,7 @@
   </header>
 
   <div class="config-warning" id="configWarning" style="display:none;">
-    ⚠️ اتصال به GitHub تنظیم نشده. مقادیر <code>owner</code>, <code>repo</code> و <code>token</code> در بالای تگ script این فایل را با مقادیر واقعی خودتان جایگزین کنید — راهنمای کامل در پاسخ چت هست.
+    ⚠️ اتصال به سرور تنظیم نشده. مقدار <code>WORKER_URL</code> در بالای تگ script این فایل را با آدرس Cloudflare Worker خودتان جایگزین کنید — راهنمای کامل در پاسخ چت هست.
   </div>
 
   <nav class="tabs">
@@ -230,73 +230,33 @@
 </div>
 
 <script>
-/* ====== تنظیمات GitHub — این مقادیر را با مقادیر ریپوی خودتان جایگزین کنید ====== */
-const GITHUB_CONFIG = {
-  owner: "mmikaeeli96-ai",
-  repo: "symbol-survey",
-  path: "votes.json",
-  branch: "main",
-  token: "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"      // Fine-grained Personal Access Token با دسترسی Contents:Read&Write فقط روی این ریپو
-};
-/* =============================================================================== */
+/* ====== تنظیمات — آدرس Cloudflare Worker خودتان را اینجا بگذارید ====== */
+const WORKER_URL = "https://symbol-survey-worker.mmikaeeli96.workers.dev/"; // مثلاً: https://symbol-survey-worker.your-subdomain.workers.dev
+/* ======================================================================= */
 
-const db = (GITHUB_CONFIG.owner !== "REPLACE_ME" && GITHUB_CONFIG.token !== "REPLACE_ME") ? true : null;
+const db = (WORKER_URL !== "REPLACE_ME" && WORKER_URL.startsWith("http")) ? true : null;
 if(!db){
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("configWarning").style.display = "block";
   });
 }
 
-function b64EncodeUtf8(str){
-  return btoa(unescape(encodeURIComponent(str)));
-}
-function b64DecodeUtf8(b64){
-  return decodeURIComponent(escape(atob(b64.replace(/\n/g, ""))));
-}
-
-async function ghGetFile(){
-  const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`;
-  const res = await fetch(url, {
-    headers: {
-      "Authorization": "Bearer " + GITHUB_CONFIG.token,
-      "Accept": "application/vnd.github+json"
-    }
-  });
-  if(!res.ok) throw new Error("خطا در خواندن فایل داده (کد " + res.status + ")");
-  return res.json(); // { content: base64, sha, ... }
-}
-
 async function jbGetVotes(){
-  const file = await ghGetFile();
-  const text = b64DecodeUtf8(file.content || "");
-  try{ return JSON.parse(text || "{}"); }catch(e){ return {}; }
+  const res = await fetch(WORKER_URL);
+  if(!res.ok) throw new Error("خطا در خواندن نتایج (کد " + res.status + ")");
+  const data = await res.json();
+  return (data && typeof data === "object") ? data : {};
 }
 
 async function jbSaveVote(name, symbols){
-  const file = await ghGetFile();
-  const text = b64DecodeUtf8(file.content || "");
-  let votes = {};
-  try{ votes = JSON.parse(text || "{}"); }catch(e){ votes = {}; }
-  votes[name] = { symbols: symbols, submittedAt: new Date().toISOString() };
-  const newContent = b64EncodeUtf8(JSON.stringify(votes, null, 2));
-  const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: {
-      "Authorization": "Bearer " + GITHUB_CONFIG.token,
-      "Accept": "application/vnd.github+json",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: "vote: " + name,
-      content: newContent,
-      sha: file.sha,
-      branch: GITHUB_CONFIG.branch
-    })
+  const res = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: name, symbols: symbols })
   });
   if(!res.ok){
     const errBody = await res.json().catch(() => ({}));
-    throw new Error("خطا در ثبت رأی (کد " + res.status + (errBody.message ? " — " + errBody.message : "") + ")");
+    throw new Error(errBody.error || ("خطا در ثبت رأی (کد " + res.status + ")"));
   }
 }
 
