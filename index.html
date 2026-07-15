@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظرسنجی انتخاب نماد</title>
+
+
+
+<style>
+  :root{
+    --bg:#0B1420; --surface:#101B2C; --surface-2:#17233A; --surface-3:#1E2C47;
+    --border:#243450; --text:#EAF0F8; --text-muted:#8CA0BE; --text-faint:#5D7093;
+    --accent:#22D3AA; --accent-dim:#123B33; --accent-2:#F0B429; --danger:#F2545B; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Vazirmatn','Segoe UI',Tahoma,Arial,sans-serif;direction:rtl;min-height:100vh;}
+  ::selection{background:var(--accent);color:#06231C;}
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--surface);}
+  ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:6px;}
+  .app{max-width:1180px;margin:0 auto;padding:20px 18px 80px;}
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 20px;border-bottom:1px solid var(--border);margin-bottom:22px;gap:12px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--accent) 0%,#0E8F73 100%);display:flex;align-items:center;justify-content:center;font-weight:800;color:#06231C;font-size:15px;flex-shrink:0;}
+  .brand-text h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.2px;}
+  .brand-text p{font-size:12px;margin:2px 0 0;color:var(--text-muted);}
+  .whoami{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);}
+  .whoami b{color:var(--text);font-weight:600;}
+  .link-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12.5px;font-family:inherit;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  .tab-btn{background:none;border:none;color:var(--text-muted);font-family:inherit;font-size:13.5px;padding:10px 16px;cursor:pointer;position:relative;font-weight:600;transition:color .15s;}
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--accent);}
+  .tab-btn.active::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--accent);border-radius:2px 2px 0 0;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .gate-overlay{position:fixed;inset:0;background:rgba(5,9,16,.82);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .gate-card{background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:32px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+  .gate-card .brand-mark{margin:0 auto 16px;width:52px;height:52px;font-size:20px;border-radius:14px;}
+  .gate-card h2{font-size:17px;margin:0 0 8px;}
+  .gate-card p{font-size:13px;color:var(--text-muted);margin:0 0 22px;line-height:1.9;}
+  .gate-card input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:12px 14px;font-size:14px;font-family:inherit;text-align:center;outline:none;transition:border-color .15s;}
+  .gate-card input:focus{border-color:var(--accent);}
+  .gate-error{color:var(--danger);font-size:12px;margin-top:8px;min-height:16px;}
+  .btn{background:var(--accent);color:#06231C;border:none;border-radius:9px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter .15s, transform .1s;}
+  .btn:hover{filter:brightness(1.08);}
+  .btn:active{transform:scale(.98);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-block{width:100%;margin-top:16px;}
+  .btn-ghost{background:none;border:1px solid var(--border);color:var(--text-muted);}
+  .control-bar{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 0 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:14px;}
+  .search-wrap{position:relative;flex:1 1 260px;min-width:200px;}
+  .search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 38px 10px 12px;font-size:13.5px;font-family:inherit;outline:none;}
+  .search-wrap input:focus{border-color:var(--accent);}
+  .search-wrap svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);opacity:.5;}
+  select.industry-select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;flex:0 0 190px;cursor:pointer;}
+  .gauge-wrap{display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+  .gauge{position:relative;width:52px;height:52px;flex-shrink:0;}
+  .gauge svg{transform:rotate(-90deg);}
+  .gauge-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:var(--text);}
+  .gauge-text{font-size:12px;color:var(--text-muted);line-height:1.5;}
+  .gauge-text b{color:var(--text);font-size:13px;}
+  .selected-row{margin-bottom:14px;}
+  .selected-row .head{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;color:var(--text-muted);margin-bottom:8px;user-select:none;}
+  .selected-row .head span.count-pill{background:var(--accent-dim);color:var(--accent);border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700;}
+  .chip-list{display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow-y:auto;padding:2px;}
+  .chip{display:flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:4px 6px 4px 10px;font-size:12px;}
+  .chip button{background:var(--surface-3);border:none;color:var(--text-muted);width:16px;height:16px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;}
+  .chip button:hover{background:var(--danger);color:#fff;}
+  .list-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);}
+  .list-header{display:grid;grid-template-columns:34px 1fr 1fr auto;gap:10px;padding:9px 14px;background:var(--surface-2);font-size:11.5px;color:var(--text-faint);font-weight:700;}
+  .list-scroll{max-height:560px;overflow-y:auto;}
+  .row-item{display:grid;grid-template-columns:34px 1fr 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--border);cursor:pointer;transition:background .1s;}
+  .row-item:hover{background:var(--surface-2);}
+  .row-item.checked{background:var(--accent-dim);}
+  .row-item input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);cursor:pointer;}
+  .sym-cell b{font-size:13.5px;font-weight:700;}
+  .sym-cell .comp{display:block;font-size:11.5px;color:var(--text-muted);margin-top:1px;}
+  .industry-badge{font-size:11px;color:var(--text-muted);background:var(--surface-3);border-radius:6px;padding:3px 8px;display:inline-block;}
+  .empty-state{padding:60px 20px;text-align:center;color:var(--text-faint);font-size:13px;}
+  .submit-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:16px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;}
+  .submit-msg{font-size:12.5px;color:var(--text-muted);}
+  .submit-msg.ok{color:var(--accent);}
+  .submit-msg.err{color:var(--danger);}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px;}
+  .card h3{margin:0 0 4px;font-size:14.5px;}
+  .card .sub{font-size:12px;color:var(--text-muted);margin:0 0 14px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;}
+  .stat{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+  .stat .n{font-size:20px;font-weight:800;color:var(--accent);}
+  .stat .l{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+  table.results-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.results-table th{text-align:right;font-size:11px;color:var(--text-faint);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);}
+  table.results-table td{padding:9px 10px;border-bottom:1px solid var(--border);}
+  table.results-table tr.top150 td{background:rgba(34,211,170,.05);}
+  .rank-badge{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;border-radius:6px;background:var(--surface-3);font-size:11px;font-weight:700;color:var(--text-muted);padding:0 4px;}
+  .rank-badge.top{background:var(--accent-dim);color:var(--accent);}
+  .vote-bar-wrap{display:flex;align-items:center;gap:8px;}
+  .vote-bar-track{flex:1;height:6px;background:var(--surface-3);border-radius:4px;overflow:hidden;max-width:110px;}
+  .vote-bar-fill{height:100%;background:var(--accent);border-radius:4px;}
+  .table-scroll{max-height:640px;overflow-y:auto;}
+  .voter-card{border-bottom:1px solid var(--border);padding:16px 0;}
+  .voter-card:last-child{border-bottom:none;}
+  .voter-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .voter-head .name{font-size:14px;font-weight:700;}
+  .voter-head .meta{font-size:11.5px;color:var(--text-muted);}
+  .pct-pill{background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;}
+  .pct-pill.good{color:var(--accent);border-color:var(--accent-dim);}
+  .voter-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .voter-chips .vchip{font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;}
+  .voter-chips .vchip.intop{border-color:var(--accent);color:var(--accent);}
+  .empty-hint{color:var(--text-faint);font-size:12.5px;text-align:center;padding:30px;}
+  .refresh-row{display:flex;justify-content:flex-end;margin-bottom:10px;}
+  .config-warning{background:#3A1F1F;border:1px solid var(--danger);color:#FFD9D9;border-radius:10px;padding:16px 18px;margin-bottom:18px;font-size:13px;line-height:2;}
+  .config-warning code{background:#1E1010;padding:1px 6px;border-radius:4px;font-size:12px;}
+  @media (max-width:640px){
+    .list-header{display:none;}
+    .row-item{grid-template-columns:24px 1fr;grid-template-rows:auto auto;}
+    .row-item .industry-badge{grid-column:2;}
+    .control-bar{flex-direction:column;align-items:stretch;}
+    select.industry-select{flex:1;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">ن</div>
+      <div class="brand-text">
+        <h1>نظرسنجی انتخاب نماد</h1>
+        <p>گردآوری درخواست‌های مدیران دارایی برای تحلیل فصل بعد</p>
+      </div>
+    </div>
+    <div class="whoami" id="whoamiBox" style="display:none;">
+      <span>خوش آمدید، <b id="whoamiName"></b></span>
+      <button class="link-btn" id="changeNameBtn">تغییر نام</button>
+    </div>
+  </header>
+
+  <div class="config-warning" id="configWarning" style="display:none;">
+    ⚠️ اتصال به GitHub تنظیم نشده. مقادیر <code>owner</code>, <code>repo</code> و <code>token</code> در بالای تگ script این فایل را با مقادیر واقعی خودتان جایگزین کنید — راهنمای کامل در پاسخ چت هست.
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="survey">نظرسنجی</button>
+    <button class="tab-btn" data-tab="results">نتایج کلی</button>
+    <button class="tab-btn" data-tab="individual">گزارش افراد</button>
+  </nav>
+
+  <section class="tab-panel active" id="panel-survey">
+    <div class="control-bar">
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="جستجوی نماد یا نام شرکت…" autocomplete="off">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <select class="industry-select" id="industrySelect">
+        <option value="">همه صنایع</option>
+      </select>
+      <div class="gauge-wrap">
+        <div class="gauge">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="22" fill="none" stroke="#1E2C47" stroke-width="5"/>
+            <circle id="gaugeArc" cx="26" cy="26" r="22" fill="none" stroke="#22D3AA" stroke-width="5" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
+          </svg>
+          <div class="gauge-label" id="gaugeLabel">0</div>
+        </div>
+        <div class="gauge-text">انتخاب شده<br><b id="countText">۰ از ۱۵۰</b></div>
+      </div>
+    </div>
+
+    <div class="selected-row" id="selectedRow" style="display:none;">
+      <div class="head" id="selectedToggle"><span>نمادهای انتخابی من <span class="count-pill" id="selCountPill">0</span></span></div>
+      <div class="chip-list" id="chipList"></div>
+    </div>
+
+    <div class="list-wrap">
+      <div class="list-header"><span></span><span>نماد</span><span>صنعت</span><span></span></div>
+      <div class="list-scroll" id="listScroll"></div>
+    </div>
+
+    <div class="submit-bar">
+      <div class="submit-msg" id="submitMsg">رأی شما تا کلیک روی «ثبت رأی» ذخیره نهایی نمی‌شود.</div>
+      <button class="btn" id="submitBtn">ثبت رأی</button>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="panel-results">
+    <div class="refresh-row"><button class="btn btn-ghost" id="refreshResultsBtn">↻ به‌روزرسانی نتایج</button></div>
+    <div class="card">
+      <h3>خلاصه نظرسنجی</h3>
+      <p class="sub">جمع رأی‌های ثبت‌شده توسط همه‌ی شرکت‌کنندگان، مرتب‌شده بر اساس تعداد درخواست</p>
+      <div class="stat-grid">
+        <div class="stat"><div class="n" id="statVoters">۰</div><div class="l">تعداد رأی‌دهندگان</div></div>
+        <div class="stat"><div class="n" id="statSymbols">۰</div><div class="l">نمادهای دارای حداقل یک رأی</div></div>
+        <div class="stat"><div class="n" id="statTop">۰</div><div class="l">آستانه ورود به ۱۵۰ برتر (تعداد رأی)</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>رتبه‌بندی نمادها</h3>
+      <p class="sub">۱۵۰ نماد برتر با پس‌زمینه‌ی سبز مشخص شده‌اند</p>
+      <div class="table-scroll" id="resultsTableWrap"><div class="empty-hint">هنوز رأیی ثبت نشده است.</div></div>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="panel-individual">
+    <div class="refresh-row"><button class="btn btn-ghost" id="refreshIndividualBtn">↻ به‌روزرسانی</button></div>
+    <div class="card">
+      <h3>گزارش رأی به تفکیک افراد</h3>
+      <p class="sub">نمادهای درخواستی هر فرد و درصدی از آن‌ها که جزو ۱۵۰ نماد برتر شده‌اند</p>
+      <div id="individualList"><div class="empty-hint">هنوز رأیی ثبت نشده است.</div></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-card">
+    <div class="brand-mark">ن</div>
+    <h2>معرفی خودتان</h2>
+    <p>برای ثبت رأی در نظرسنجی انتخاب نماد، لطفاً نام و نام خانوادگی خود را وارد کنید.</p>
+    <input type="text" id="gateNameInput" placeholder="مثلاً: علی محمدی" autocomplete="off">
+    <div class="gate-error" id="gateError"></div>
+    <button class="btn btn-block" id="gateSubmit">ورود و شروع</button>
+  </div>
+</div>
+
+<script>
+/* ====== تنظیمات GitHub — این مقادیر را با مقادیر ریپوی خودتان جایگزین کنید ====== */
+const GITHUB_CONFIG = {
+  owner: "REPLACE_ME",     // یوزرنیم گیت‌هاب شما
+  repo: "REPLACE_ME",      // اسم ریپو (همون ریپوی GitHub Pages)
+  path: "votes.json",      // اسم فایل داده — همون که توی ریپو ساختید با محتوای {}
+  branch: "main",          // اسم برنچ (اگه ریپو با master ساخته شده این را عوض کنید)
+  token: "REPLACE_ME"      // Fine-grained Personal Access Token با دسترسی Contents:Read&Write فقط روی این ریپو
+};
+/* =============================================================================== */
+
+const db = (GITHUB_CONFIG.owner !== "REPLACE_ME" && GITHUB_CONFIG.token !== "REPLACE_ME") ? true : null;
+if(!db){
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("configWarning").style.display = "block";
+  });
+}
+
+function b64EncodeUtf8(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function b64DecodeUtf8(b64){
+  return decodeURIComponent(escape(atob(b64.replace(/\n/g, ""))));
+}
+
+async function ghGetFile(){
+  const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`;
+  const res = await fetch(url, {
+    headers: {
+      "Authorization": "Bearer " + GITHUB_CONFIG.token,
+      "Accept": "application/vnd.github+json"
+    }
+  });
+  if(!res.ok) throw new Error("خطا در خواندن فایل داده (کد " + res.status + ")");
+  return res.json(); // { content: base64, sha, ... }
+}
+
+async function jbGetVotes(){
+  const file = await ghGetFile();
+  const text = b64DecodeUtf8(file.content || "");
+  try{ return JSON.parse(text || "{}"); }catch(e){ return {}; }
+}
+
+async function jbSaveVote(name, symbols){
+  const file = await ghGetFile();
+  const text = b64DecodeUtf8(file.content || "");
+  let votes = {};
+  try{ votes = JSON.parse(text || "{}"); }catch(e){ votes = {}; }
+  votes[name] = { symbols: symbols, submittedAt: new Date().toISOString() };
+  const newContent = b64EncodeUtf8(JSON.stringify(votes, null, 2));
+  const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + GITHUB_CONFIG.token,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "vote: " + name,
+      content: newContent,
+      sha: file.sha,
+      branch: GITHUB_CONFIG.branch
+    })
+  });
+  if(!res.ok){
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error("خطا در ثبت رأی (کد " + res.status + (errBody.message ? " — " + errBody.message : "") + ")");
+  }
+}
+
+const DATA = [{"symbol": "وبملت", "company": "بانک ملت", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "وگردش", "company": "بانک گردشگری", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "خودرو", "company": "ایران‌ خودرو", "industry": "خودرو"}, {"symbol": "بورس", "company": "بورس اوراق بهادار تهران", "industry": "فعالیتهای مرتبط با اوراق بهادار"}, {"symbol": "کالا", "company": "بورس کالای ایران", "industry": "فعالیتهای مرتبط با اوراق بهادار"}, {"symbol": "کگل", "company": "معدنی و صنعتی گل گهر", "industry": "کانی های فلزی"}, {"symbol": "شستا", "company": "سرمایه گذاری تامین اجتماعی", "industry": "سرمایه گذاری"}, {"symbol": "وفیروزه", "company": "گروه توسعه مالی فیروزه", "industry": "سرمایه گذاری"}, {"symbol": "هجرت", "company": "پخش هجرت", "industry": "دارویی"}, {"symbol": "دزهراوی", "company": "داروسازی‌زهراوی‌", "industry": "دارویی"}, {"symbol": "وتجارت", "company": "بانک تجارت", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "شپنا", "company": "پالایش نفت اصفهان", "industry": "فراورده های نفتی"}, {"symbol": "شتران", "company": "پالایش نفت تهران", "industry": "فراورده های نفتی"}, {"symbol": "رانیز", "company": "کارخانجات رینگ اسپرت نورنی ریز", "industry": "قطعات خودرو"}, {"symbol": "خبهمن", "company": "گروه‌بهمن‌", "industry": "سرمایه گذاری"}, {"symbol": "وبصادر", "company": "بانک صادرات ایران", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "فملی", "company": "ملی‌ صنایع‌ مس‌ ایران‌", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "وصنا", "company": "گروه‌صنایع‌بهشهرایران‌", "industry": "سرمایه گذاری"}, {"symbol": "وخارزم", "company": "سرمایه گذاری خوارزمی", "industry": "سرمایه گذاری"}, {"symbol": "ثمسکن", "company": "سرمایه‌گذاری‌ مسکن‌", "industry": "سرمایه گذاری"}, {"symbol": "اخابر", "company": "مخابرات ایران", "industry": "مخابرات"}, {"symbol": "حفاری", "company": "حفاری شمال", "industry": "حفاری"}, {"symbol": "دسبحان", "company": "سبحان دارو", "industry": "دارویی"}, {"symbol": "ذوب", "company": "ذوب آهن اصفهان", "industry": "آهن و فولاد"}, {"symbol": "پترول", "company": "گ.س.وت.ص.پتروشیمی خلیج فارس", "industry": "سرمایه گذاری"}, {"symbol": "تاصیکو", "company": "سرمایه گذاری صدرتامین", "industry": "سرمایه گذاری"}, {"symbol": "دی", "company": "بانک دی", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "دیران", "company": "ایران‌دارو", "industry": "دارویی"}, {"symbol": "وغدیر", "company": "سرمایه‌گذاری‌غدیر(هلدینگ‌", "industry": "سرمایه گذاری"}, {"symbol": "غدانه", "company": "پنبه و دانه های روغنی خراسان", "industry": "سایر محصولات غذایی"}, {"symbol": "های وب", "company": "داده گسترعصرنوین-های وب", "industry": "مخابرات"}, {"symbol": "رتاپ", "company": "تجارت الکترونیک  پارسیان", "industry": "نرم افزار و خدمات"}, {"symbol": "دعبید", "company": "لابراتوارداروسازی‌  دکترعبیدی‌", "industry": "دارویی"}, {"symbol": "وسینا", "company": "بانک سینا", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "کفرا", "company": "فراورده‌ های‌ نسوزایران‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "انرژی", "company": "بورس انرژی ایران", "industry": "فعالیتهای مرتبط با اوراق بهادار"}, {"symbol": "وپارس", "company": "بانک‌پارسیان‌", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "کسرا", "company": "سرامیک‌های‌صنعتی‌اردکان‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "ومدیر", "company": "گ.مدیریت ارزش سرمایه ص ب کشوری", "industry": "سرمایه گذاری"}, {"symbol": "بجهرم", "company": "توسعه مولد نیروگاهی جهرم", "industry": "خدمات رفاهی-برق "}, {"symbol": "حکشتی", "company": "کشتیرانی جمهوری اسلامی ایران", "industry": "سرمایه گذاری"}, {"symbol": "فارس", "company": "صنایع پتروشیمی خلیج فارس", "industry": "سرمایه گذاری"}, {"symbol": "شبندر", "company": "پالایش نفت بندرعباس", "industry": "فراورده های نفتی"}, {"symbol": "بمولد", "company": "مولد نیروگاهی تجارت فارس", "industry": "خدمات رفاهی-برق "}, {"symbol": "کمنگنز", "company": "معادن‌منگنزایران‌", "industry": "کانی های فلزی"}, {"symbol": "خیمن", "company": "ایمن خودرو شرق", "industry": "قطعات خودرو"}, {"symbol": "کرازی", "company": "کارخانجات‌تولیدی‌شیشه‌رازی‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "قاسم", "company": "قاسم ایران", "industry": "خرده فروشی،باستثنای وسایل نقلیه موتوری"}, {"symbol": "شپاکسا", "company": "پاکسان‌", "industry": "محصولات پاک کننده"}, {"symbol": "ثپردیس", "company": "سرمایه گذاری مسکن پردیس", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "دتوزیع", "company": "توزیع دارو پخش", "industry": "دارویی"}, {"symbol": "قثابت", "company": "قند ثابت‌ خراسان‌", "industry": "شکر"}, {"symbol": "وخاور", "company": "بانک خاورمیانه", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "ختراک", "company": "ریخته‌گری‌ تراکتورسازی‌ ایران‌", "industry": "قطعات خودرو"}, {"symbol": "فایرا", "company": "آلومینیوم‌ایران‌", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "کگهر", "company": "معدنی و صنعتی گهرزمین", "industry": "کانی های فلزی"}, {"symbol": "شمواد", "company": "تولید مواداولیه الیاف مصنوعی", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "غپینو", "company": "پارس‌ مینو", "industry": "شیرینیجات"}, {"symbol": "فتوسا", "company": "تولید و توسعه سرب روی ایرانیان", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "دقاضی", "company": "داروسازی شهید قاضی", "industry": "دارویی"}, {"symbol": "شگستر", "company": "گسترش سوخت سبززاگرس(سهامی عام)", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "وشهر", "company": "بانک شهر", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "غبهار", "company": "کشت وصنعت بهاران گلبهار خراسان", "industry": "سایر محصولات غذایی"}, {"symbol": "حخزر", "company": "کشتیرانی دریای خزر", "industry": "بنادر و کشتیرانی"}, {"symbol": "دبالک", "company": "مواد اولیه دارویی البرز بالک", "industry": "دارویی"}, {"symbol": "ولراز", "company": "لیزینگ رازی", "industry": "لیزینگ"}, {"symbol": "کی بی سی", "company": "شرکت کی بی سی", "industry": "دارویی"}, {"symbol": "شگویا", "company": "پتروشیمی تندگویان", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "فگستر", "company": "گسترش صنایع روی ایرانیان", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "سجام", "company": "مجتمع سیمان غرب آسیا", "industry": "سیمان، اهک و گچ"}, {"symbol": "شبهرن", "company": "نفت‌ بهران‌", "industry": "فراورده های نفتی"}, {"symbol": "غبشهر", "company": "صنعتی‌ بهشهر", "industry": "سایر محصولات غذایی"}, {"symbol": "شمس", "company": "تولید انرژی برق شمس پاسارگاد", "industry": "خدمات رفاهی-برق "}, {"symbol": "فسوژ", "company": "سوژمیران", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "سرود", "company": "سیمان‌شاهرود", "industry": "سیمان، اهک و گچ"}, {"symbol": "سلیم", "company": "سرمایه گذاری سلیم", "industry": "سرمایه گذاری"}, {"symbol": "هرمز", "company": "فولاد هرمزگان جنوب", "industry": "آهن و فولاد"}, {"symbol": "کاما", "company": "باما", "industry": "کانی های فلزی"}, {"symbol": "کاسپین", "company": "داروسازی کاسپین تامین", "industry": "دارویی"}, {"symbol": "همراه", "company": "شرکت ارتباطات سیار ایران", "industry": "مخابرات"}, {"symbol": "مهرگان", "company": "گروه مالی مهرگان تامین پارس", "industry": "سرمایه گذاری"}, {"symbol": "ناما", "company": "تولیدی مخازن گازطبیعی آسیاناما", "industry": "محصولات فلزی"}, {"symbol": "کوچین", "company": "تولیدی کوچین", "industry": "سایر محصولات غذایی"}, {"symbol": "دسانکو", "company": "داروسازی سبحان انکولوژی", "industry": "دارویی"}, {"symbol": "پاکشو", "company": "گروه صنعتی پاکشو", "industry": "محصولات پاک کننده"}, {"symbol": "ونوین", "company": "بانک‌اقتصادنوین‌", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "فولاژ", "company": "فولاد آلیاژی ایران", "industry": "آهن و فولاد"}, {"symbol": "فنر", "company": "پارس فنر", "industry": "قطعات خودرو"}, {"symbol": "نوین", "company": "بیمه نوین", "industry": "بیمه"}, {"symbol": "پخش", "company": "پخش البرز", "industry": "خرده فروشی،باستثنای وسایل نقلیه موتوری"}, {"symbol": "غمینو", "company": "شرکت صنایع غذایی مینو شرق", "industry": "شیرینیجات"}, {"symbol": "کقزوی", "company": "شیشه‌ قزوین‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "خساپا", "company": "سایپا", "industry": "خودرو"}, {"symbol": "غصینو", "company": "صنعتی مینو", "industry": "شیرینیجات"}, {"symbol": "وسکاب", "company": "س.ص.بازنشستگی کارکنان بانکها", "industry": "سرمایه گذاری"}, {"symbol": "ثغرب", "company": "شرکت سرمایه گذاری مسکن شمالغرب", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "کوثر", "company": "بیمه کوثر", "industry": "بیمه"}, {"symbol": "کپشیر", "company": "پشم‌شیشه‌ایران‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "وبیمه", "company": "سرمایه‌ گذاری‌ صنعت‌ بیمه‌", "industry": "سرمایه گذاری"}, {"symbol": "فجر", "company": "فولاد امیرکبیرکاشان", "industry": "آهن و فولاد"}, {"symbol": "برکت", "company": "گروه دارویی برکت", "industry": "سرمایه گذاری"}, {"symbol": "ختوقا", "company": "قطعات‌ اتومبیل‌ ایران‌", "industry": "سرمایه گذاری"}, {"symbol": "وثنو", "company": "سرمایه گذاری ساختمانی نوین", "industry": "سرمایه گذاری"}, {"symbol": "غشان", "company": "شیرپاستوریزه‌پگاه‌خراسان‌", "industry": "محصولات لبنی"}, {"symbol": "فزر", "company": "پویا زرکان آق دره", "industry": "کانی های فلزی"}, {"symbol": "شسپا", "company": "نفت سپاهان", "industry": "فراورده های نفتی"}, {"symbol": "وامیر", "company": "گروه صنعتی و معدنی امیر", "industry": "سرمایه گذاری"}, {"symbol": "دارو", "company": "کارخانجات‌داروپخش‌", "industry": "دارویی"}, {"symbol": "واحیا", "company": "م .صنایع و معادن احیاء سپاهان", "industry": "سرمایه گذاری"}, {"symbol": "زنگان", "company": "صنعت روی زنگان", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "وکادو", "company": "تکادو", "industry": "سرمایه گذاری"}, {"symbol": "رمپنا", "company": "گروه مپنا (سهامی عام)", "industry": "فعالیت مهندسی"}, {"symbol": "الکتروماد", "company": "صنایع الکترونیک مادیران", "industry": "وسایل خانگی"}, {"symbol": "شلعاب", "company": "لعابیران‌", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "فبیرا", "company": "بسته‌ بندی‌ ایران‌", "industry": "محصولات فلزی"}, {"symbol": "خگستر", "company": "گسترش‌سرمایه‌گذاری‌ایران‌خودرو", "industry": "سرمایه گذاری"}, {"symbol": "پیزد", "company": "مجتمع صنایع لاستیک یزد", "industry": "لاستیک و پلاستیک"}, {"symbol": "وپاسار", "company": "بانک  پاسارگاد", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "قشکر", "company": "شکر", "industry": "شکر"}, {"symbol": "ورازی", "company": "بیمه رازی", "industry": "بیمه"}, {"symbol": "فروژ", "company": "صنایع فروآلیاژ ایران", "industry": "آهن و فولاد"}, {"symbol": "ولساپا", "company": "لیزینگ رایان‌ سایپا", "industry": "لیزینگ"}, {"symbol": "سمگا", "company": "گروه سرمایه گذاری میراث فرهنگی", "industry": "سرمایه گذاری"}, {"symbol": "غگرجی", "company": "بیسکویت‌  گرجی‌", "industry": "شیرینیجات"}, {"symbol": "دتماد", "company": "تولیدمواداولیه‌داروپخش‌", "industry": "دارویی"}, {"symbol": "افق", "company": "فروشگاههای زنجیره ای افق کوروش", "industry": "خرده فروشی،باستثنای وسایل نقلیه موتوری"}, {"symbol": "پکرمان", "company": "گروه‌ صنعتی‌ بارز", "industry": "لاستیک و پلاستیک"}, {"symbol": "تاپیکو", "company": "س. نفت و گاز و پتروشیمی تامین", "industry": "سرمایه گذاری"}, {"symbol": "پتایر", "company": "ایران‌ تایر", "industry": "لاستیک و پلاستیک"}, {"symbol": "خفنر", "company": "فنرسازی‌خاور", "industry": "قطعات خودرو"}, {"symbol": "سپید", "company": "سپید ماکیان", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "ثامید", "company": "توسعه و عمران امید", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "سلار", "company": "شرکت سیمان لارستان", "industry": "سیمان، اهک و گچ"}, {"symbol": "ساینا", "company": "صنایع بهداشتی ساینا", "industry": "محصولات پاک کننده"}, {"symbol": "شسینا", "company": "صنایع‌شیمیایی‌سینا", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "بپاس", "company": "بیمه پاسارگاد", "industry": "بیمه"}, {"symbol": "شیران", "company": "س. صنایع‌شیمیایی‌ایران", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "تاپکیش", "company": "تجارت الکترونیک پارسیان کیش", "industry": "نرم افزار و خدمات"}, {"symbol": "ستران", "company": "سیمان‌ تهران‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "دپارس", "company": "پارس‌ دارو", "industry": "دارویی"}, {"symbol": "فنفت", "company": "صنایع تجهیزات نفت", "industry": "سرمایه گذاری"}, {"symbol": "پارس", "company": "پتروشیمی پارس", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "دفارا", "company": "داروسازی‌ فارابی‌", "industry": "دارویی"}, {"symbol": "ارفع", "company": "شرکت آهن و فولاد ارفع", "industry": "آهن و فولاد"}, {"symbol": "سیسکو", "company": "فولاد سیرجان ایرانیان", "industry": "آهن و فولاد"}, {"symbol": "قرن", "company": "پدیده شیمی قرن", "industry": "محصولات پاک کننده"}, {"symbol": "البرز", "company": "بیمه البرز", "industry": "بیمه"}, {"symbol": "وساخت", "company": "سرمایه‌ گذاری‌ ساختمان‌ایران‌", "industry": "سرمایه گذاری"}, {"symbol": "حیات", "company": "بیمه زندگی مفید", "industry": "بیمه"}, {"symbol": "وگستر", "company": "گسترش سرمایه گذاری ایرانیان", "industry": "سرمایه گذاری"}, {"symbol": "شهر", "company": "گروه مالی شهر", "industry": "سرمایه گذاری"}, {"symbol": "حفارس", "company": "حمل و نقل بین المللی خلیج فارس", "industry": "حمل و نقل بار زمینی"}, {"symbol": "فلوله", "company": "لوله‌وماشین‌سازی‌ایران‌", "industry": "آهن و فولاد"}, {"symbol": "ثاخت", "company": "بین‌المللی‌توسعه‌ساختمان", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "بتیس", "company": "بیمه زندگی ایساتیس", "industry": "بیمه"}, {"symbol": "شلرد", "company": "کود شیمیایی اوره لردگان", "industry": "تولید کود و ترکیبات نیتروژن"}, {"symbol": "اپرداز", "company": "آتیه داده پرداز", "industry": "نرم افزار و خدمات"}, {"symbol": "دانا", "company": "بیمه دانا", "industry": "بیمه"}, {"symbol": "غپونه", "company": "نوش پونه مشهد", "industry": "سایر محصولات غذایی"}, {"symbol": "تجلی", "company": "تجلی توسعه معادن و فلزات", "industry": "سرمایه گذاری"}, {"symbol": "ورنا", "company": "سرمایه‌گذاری‌ رنا(هلدینگ‌", "industry": "سرمایه گذاری"}, {"symbol": "کنور", "company": "توسعه معدنی و صنعتی صبانور", "industry": "کانی های فلزی"}, {"symbol": "غناب", "company": "روغن‌ نباتی‌ ناب", "industry": "سایر محصولات غذایی"}, {"symbol": "دزاگرس", "company": "دارویی و نهاده های زاگرس دارو", "industry": "دارویی"}, {"symbol": "وکار", "company": "بانک‌ کارآفرین‌", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "وفتخار", "company": "سرمایه گذاری افتخار سهام", "industry": "سرمایه گذاری"}, {"symbol": "والبر", "company": "سرمایه‌ گذاری‌ البرز(هلدینگ‌", "industry": "سرمایه گذاری"}, {"symbol": "وایرا", "company": "سرمایه گذاری صنایع ایران", "industry": "سرمایه گذاری"}, {"symbol": "وتوشه", "company": "سرمایه‌ گذاری‌ پارس‌ توشه‌", "industry": "سرمایه گذاری"}, {"symbol": "فباهنر", "company": "مس‌ شهیدباهنر", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "ثبهساز", "company": "بهساز کاشانه تهران", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "خدیزل", "company": "بهمن  دیزل", "industry": "خودرو"}, {"symbol": "لوتوس", "company": "تامین سرمایه لوتوس پارسیان", "industry": "تامین سرمایه"}, {"symbol": "ولاعتماد", "company": "واسپاری عصراعتماد", "industry": "لیزینگ"}, {"symbol": "ونفت", "company": "سرمایه‌گذاری‌ صنعت‌ نفت‌", "industry": "سرمایه گذاری"}, {"symbol": "دالبر", "company": "البرزدارو", "industry": "دارویی"}, {"symbol": "ولتجار", "company": "واسپاری تجارایرانیان", "industry": "لیزینگ"}, {"symbol": "فسپا", "company": "گروه‌صنعتی‌سپاهان‌", "industry": "آهن و فولاد"}, {"symbol": "حآسا", "company": "آسیا سیر ارس", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "حپارسا", "company": "توسعه حمل و نقل ریلی پارسیان", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "وسپه", "company": "سرمایه‌گذاری‌ سپه‌", "industry": "سرمایه گذاری"}, {"symbol": "تنوین", "company": "تامین سرمایه نوین", "industry": "تامین سرمایه"}, {"symbol": "وبهمن", "company": "سرمایه‌گذاری‌بهمن‌", "industry": "سرمایه گذاری"}, {"symbol": "آباد", "company": "توریستی ورفاهی آبادگران ایران", "industry": "هتل و رستوران"}, {"symbol": "انتخاب", "company": "گروه انتخاب الکترونیک آرمان", "industry": "وسایل خانگی"}, {"symbol": "وسدید", "company": "گروه ‌صنعتی‌سدید", "industry": "سرمایه گذاری"}, {"symbol": "مفاخر", "company": "توسعه فناوری اطلاعات خوارزمی", "industry": "سخت افزار و تجهیزات"}, {"symbol": "ثپهران", "company": "توسعه ساختمان سپهر تهران", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "آریان", "company": "سرمایه گذاری پارس آریان", "industry": "سرمایه گذاری"}, {"symbol": "وهامون", "company": "سرمایه گذاری هامون صبا", "industry": "سرمایه گذاری"}, {"symbol": "مهرمام", "company": "مهرمام میهن", "industry": "خدمات درمانی"}, {"symbol": "فنوال", "company": "نورد آلومینیوم‌", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "نوری", "company": "پتروشیمی نوری", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "وارس", "company": "سرمایه گذاری ارس صبا", "industry": "سرمایه گذاری"}, {"symbol": "وسپهر", "company": "گروه سرمایه گذاری سپهر صادرات", "industry": "سرمایه گذاری"}, {"symbol": "شپارس", "company": "بین‌ المللی‌ محصولات‌  پارس‌", "industry": "محصولات پاک کننده"}, {"symbol": "ثامان", "company": "سامان‌ گستراصفهان‌", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "دتولید", "company": "داروسازی تولید دارو", "industry": "دارویی"}, {"symbol": "کرمان", "company": "س. توسعه و عمران استان کرمان", "industry": "سرمایه گذاری"}, {"symbol": "سخاش", "company": "سیمان‌خاش‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "ولپارس", "company": "لیزینگ پارسیان", "industry": "لیزینگ"}, {"symbol": "بنیرو", "company": "نیروترانس‌", "industry": "ماشین الات الکتریکی"}, {"symbol": "فخاس", "company": "فولاد خراسان", "industry": "آهن و فولاد"}, {"symbol": "شساخت", "company": "مهندسی و ساختمان صنایع نفت", "industry": "حفاری"}, {"symbol": "کحافظ", "company": "کاشی‌ وسرامیک‌ حافظ‌", "industry": "کاشی و سرامیک"}, {"symbol": "زفکا", "company": "کشت و دامداری فکا", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "ملت", "company": "بیمه ملت", "industry": "بیمه"}, {"symbol": "شنفت", "company": "نفت‌ پارس‌", "industry": "فراورده های نفتی"}, {"symbol": "ددانا", "company": "داروسازی دانا", "industry": "دارویی"}, {"symbol": "قشرین", "company": "قند شیرین خراسان", "industry": "شکر"}, {"symbol": "فصبا", "company": "صبا فولاد خلیج فارس", "industry": "آهن و فولاد"}, {"symbol": "شپدیس", "company": "پتروشیمی پردیس", "industry": "تولید کود و ترکیبات نیتروژن"}, {"symbol": "وامین", "company": "سرمایه گذاری امین مهرگان", "industry": "سرمایه گذاری"}, {"symbol": "لبوتان", "company": "گروه‌صنعتی‌بوتان‌", "industry": "وسایل خانگی"}, {"symbol": "داترا", "company": "آترا زیست آرای", "industry": "دارویی"}, {"symbol": "غمارگ", "company": "مارگارین", "industry": "سایر محصولات غذایی"}, {"symbol": "نیان", "company": "نیان الکترونیک", "industry": "سخت افزار و تجهیزات"}, {"symbol": "پارسیان", "company": "بیمه پارسیان", "industry": "بیمه"}, {"symbol": "زبینا", "company": "کشاورزی و دامپروری بینالود", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "مدیریت", "company": "س. و خدمات مدیریت صند. ب کشوری", "industry": "سرمایه گذاری"}, {"symbol": "توسن", "company": "توسعه سامانه ی نرم افزاری نگین", "industry": "نرم افزار و خدمات"}, {"symbol": "فن افزار", "company": "توسعه فن افزار توسن", "industry": "نرم افزار و خدمات"}, {"symbol": "فلامی", "company": "لامیران‌", "industry": "محصولات فلزی"}, {"symbol": "حگهر", "company": "حمل و نقل گهرترابر سیرجان", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "تپکو", "company": "تولیدتجهیزات‌سنگین‌هپکو", "industry": "ماشین الات"}, {"symbol": "کاوه", "company": "فولاد کاوه جنوب کیش", "industry": "آهن و فولاد"}, {"symbol": "تپسی", "company": "پیشگامان فن آوری و دانش آرامیس", "industry": "نرم افزار و خدمات"}, {"symbol": "خزامیا", "company": "زامیاد", "industry": "خودرو"}, {"symbol": "قصفها", "company": "قنداصفهان‌", "industry": "شکر"}, {"symbol": "غشهداب", "company": "کشت و صنعت شهداب ناب خراسان", "industry": "سایر محصولات غذایی"}, {"symbol": "کچاد", "company": "معدنی‌وصنعتی‌چادرملو", "industry": "کانی های فلزی"}, {"symbol": "صبا", "company": "گروه مالی صبا تامین", "industry": "سرمایه گذاری"}, {"symbol": "ومهان", "company": "گروه توسعه مالی مهرآیندگان", "industry": "سرمایه گذاری"}, {"symbol": "ولکار", "company": "لیزینگ کارآفرین", "industry": "لیزینگ"}, {"symbol": "درازی", "company": "پخش رازی", "industry": "دارویی"}, {"symbol": "وتوکا", "company": "سرمایه‌گذاری‌توکافولاد(هلدینگ", "industry": "سرمایه گذاری"}, {"symbol": "قنقش", "company": "قند نقش جهان", "industry": "شکر"}, {"symbol": "تملت", "company": "تامین سرمایه بانک ملت", "industry": "تامین سرمایه"}, {"symbol": "چکاپا", "company": "گروه صنایع کاغذ پارس", "industry": "محصولات کاغذی"}, {"symbol": "اسیاتک", "company": "انتقال داده های آسیاتک", "industry": "مخابرات"}, {"symbol": "کسعدی", "company": "کاشی‌ سعدی‌", "industry": "کاشی و سرامیک"}, {"symbol": "تادیکو", "company": "س.کشت ودام صنایع لبنی تامین", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "کاذر", "company": "فرآورده‌های‌نسوزآذر", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "شوینده", "company": "مدیریت صنعت شوینده ت.ص.بهشهر", "industry": "سرمایه گذاری"}, {"symbol": "فن آوا", "company": "گروه فن آوا", "industry": "سرمایه گذاری"}, {"symbol": "قمرو", "company": "قند مرودشت‌", "industry": "شکر"}, {"symbol": "کربن", "company": "کانی کربن طبس", "industry": "زغال سنگ"}, {"symbol": "وسین", "company": "بیمه سینا", "industry": "بیمه"}, {"symbol": "تایرا", "company": "تراکتورسازی‌ایران‌", "industry": "ماشین الات"}, {"symbol": "خرینگ", "company": "رینگ‌سازی‌مشهد", "industry": "قطعات خودرو"}, {"symbol": "وسبحان", "company": "سرمایه گذاری سبحان", "industry": "سرمایه گذاری"}, {"symbol": "نیروترانسفو", "company": "کارخانجات تولیدی نیروترانسفو", "industry": "ماشین الات الکتریکی"}, {"symbol": "دلر", "company": "داروسازی‌ اکسیر", "industry": "دارویی"}, {"symbol": "حسیر", "company": "ریل سیر کوثر", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "وهور", "company": "گروه س.انرژی امید  تابان هور", "industry": "سرمایه گذاری"}, {"symbol": "اوان", "company": "مبین وان کیش", "industry": "نرم افزار و خدمات"}, {"symbol": "پارسان", "company": "گسترش نفت و گاز پارسیان", "industry": "سرمایه گذاری"}, {"symbol": "میهن", "company": "بیمه میهن", "industry": "بیمه"}, {"symbol": "امید", "company": "تامین سرمایه امید", "industry": "تامین سرمایه"}, {"symbol": "خموتور", "company": "موتورسازان‌تراکتورسازی‌ایران‌", "industry": "قطعات خودرو"}, {"symbol": "خنور", "company": "نورایستا پلاستیک", "industry": "قطعات خودرو"}, {"symbol": "تکیمیا", "company": "تامین سرمایه کیمیا", "industry": "تامین سرمایه"}, {"symbol": "کزغال", "company": "زغال سنگ پروده طبس", "industry": "زغال سنگ"}, {"symbol": "وتوصا", "company": "گروه س توسعه صنعتی ایران", "industry": "سرمایه گذاری"}, {"symbol": "شگل", "company": "گلتاش‌", "industry": "محصولات پاک کننده"}, {"symbol": "بوعلی", "company": "پتروشیمی بوعلی سینا", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "کترام", "company": "تولیدی‌ کاشی‌ تکسرام‌", "industry": "کاشی و سرامیک"}, {"symbol": "آ س پ", "company": "آ.س.پ", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "خودکفا", "company": "اقتصادی و خودکفایی آزادگان", "industry": "سرمایه گذاری"}, {"symbol": "وتوسم", "company": "سرمایه‌گذاری‌توسعه‌ملی‌", "industry": "سرمایه گذاری"}, {"symbol": "شفارس", "company": "صنایع‌ شیمیایی‌ فارس‌", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "کهمدا", "company": "شیشه‌ همدان‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "خزر", "company": "فنرسازی‌زر", "industry": "قطعات خودرو"}, {"symbol": "حسینا", "company": "توسعه خدمات دریایی وبندری سینا", "industry": "بنادر و کشتیرانی"}, {"symbol": "شیفته", "company": "کشت و صنعت شیفته آرای شرق", "industry": "سایر محصولات غذایی"}, {"symbol": "سغرب", "company": "سیمان‌غرب‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "زدشت", "company": "کشت و صنعت دشت خرم دره", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "دسبحا", "company": "گروه دارویی سبحان", "industry": "سرمایه گذاری"}, {"symbol": "چاپ", "company": "ص.چاپ وبسته بندی آسان قزوین", "industry": "محصولات کاغذی"}, {"symbol": "کخاک", "company": "صنایع‌خاک‌چینی‌ایران‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "شپلی", "company": "پلی اکریل ایران", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "بمیلا", "company": "توسعه سرمایه گذاری میلاد پارس", "industry": "تجارت عمده وخرده فروشی وسائط نقلیه موتور"}, {"symbol": "ونیکی", "company": "سرمایه‌گذاری‌ ملی‌ایران‌", "industry": "سرمایه گذاری"}, {"symbol": "گوهران", "company": "سرمایه گذاری توسعه گوهران امید", "industry": "سرمایه گذاری"}, {"symbol": "زگلدشت", "company": "کشت و دام گلدشت نمونه اصفهان", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "حتوکا", "company": "حمل‌ونقل‌توکا", "industry": "حمل و نقل بار زمینی"}, {"symbol": "سپاها", "company": "سیمان‌سپاهان‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "اتکام", "company": "بیمه اتکایی امین", "industry": "بیمه"}, {"symbol": "وطوبی", "company": "سرمایه گذاری اقتصاد شهر طوبی", "industry": "سرمایه گذاری"}, {"symbol": "وبانک", "company": "سرمایه گذاری گروه توسعه ملی", "industry": "سرمایه گذاری"}, {"symbol": "بنو", "company": "بیمه تجارت نو", "industry": "بیمه"}, {"symbol": "چکارن", "company": "کارتن‌ ایران‌", "industry": "محصولات کاغذی"}, {"symbol": "ذرت", "company": "زرین ذرت شاهرود", "industry": "سایر محصولات غذایی"}, {"symbol": "فغدیر", "company": "آهن و فولاد غدیر ایرانیان", "industry": "آهن و فولاد"}, {"symbol": "توریل", "company": "توکاریل", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "دابور", "company": "داروسازی‌ ابوریحان‌", "industry": "دارویی"}, {"symbol": "مهر", "company": "سرمایه گذاری مهر", "industry": "سرمایه گذاری"}, {"symbol": "خکار", "company": "ایرکا پارت صنعت", "industry": "قطعات خودرو"}, {"symbol": "کیسون", "company": "شرکت کیسون", "industry": "فعالیت مهندسی"}, {"symbol": "شفا", "company": "سرمایه گذاری شفادارو", "industry": "سرمایه گذاری"}, {"symbol": "چکاوه", "company": "صنایع‌کاغذسازی‌کاوه‌", "industry": "محصولات کاغذی"}, {"symbol": "وپایا", "company": "سرمایه گذاری پایا تدبیرپارسا", "industry": "سرمایه گذاری"}, {"symbol": "نان", "company": "صنایع غذایی رضوی", "industry": "شیرینیجات"}, {"symbol": "ونیرو", "company": "سرمایه‌گذاری‌نیرو", "industry": "سرمایه گذاری"}, {"symbol": "مداران", "company": "داده‌پردازی‌ایران‌", "industry": "سخت افزار و تجهیزات"}, {"symbol": "واعتبار", "company": "سرمایه گذاری اعتبار ایران", "industry": "سرمایه گذاری"}, {"symbol": "بپردیس", "company": "بیمه پردیس", "industry": "بیمه"}, {"symbol": "ساوه", "company": "سیمان ساوه", "industry": "سیمان، اهک و گچ"}, {"symbol": "غویتا", "company": "ویتانا", "industry": "شیرینیجات"}, {"symbol": "شفن", "company": "پتروشیمی فناوران", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "سخواف", "company": "سیمان مجد خواف", "industry": "سیمان، اهک و گچ"}, {"symbol": "وپویا", "company": "سرمایه گذاری پویا", "industry": "سرمایه گذاری"}, {"symbol": "امین", "company": "تامین سرمایه امین", "industry": "تامین سرمایه"}, {"symbol": "غچین", "company": "کشت‌ و صنعت‌ چین‌ چین", "industry": "سایر محصولات غذایی"}, {"symbol": "فولای", "company": "صنایع فولاد آلیاژی یزد", "industry": "آهن و فولاد"}, {"symbol": "پتوسعه", "company": "س. و توسعه صنایع لاستیک", "industry": "لاستیک و پلاستیک"}, {"symbol": "گدنا", "company": "تهیه توزیع غذای دنا آفرین فدک", "industry": "هتل و رستوران"}, {"symbol": "شفام", "company": "تولیدی و صنعتی گوهرفام", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "وسرمد", "company": "بیمه  سرمد", "industry": "بیمه"}, {"symbol": "بخاور", "company": "بیمه زندگی خاورمیانه", "industry": "بیمه"}, {"symbol": "دکیمی", "company": "کیمیدارو", "industry": "دارویی"}, {"symbol": "فسازان", "company": "غلتک سازان سپاهان", "industry": "آهن و فولاد"}, {"symbol": "کیمیا", "company": "ص. معدنی کیمیای زنجان گستران", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "داسوه", "company": "داروسازی‌ اسوه‌", "industry": "دارویی"}, {"symbol": "سبزوا", "company": "سیمان لار سبزوار", "industry": "سیمان، اهک و گچ"}, {"symbol": "ولنوین", "company": "لیزینگ اقتصاد نوین", "industry": "لیزینگ"}, {"symbol": "معین", "company": "بیمه ایران - معین", "industry": "بیمه"}, {"symbol": "وپست", "company": "پست بانک ایران", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "سقاین", "company": "سیمان‌ قائن‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "فسرب", "company": "ملی‌ سرب‌وروی‌ ایران‌", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "آواپارس", "company": "بیمه اتکایی آوای پارس", "industry": "بیمه"}, {"symbol": "وکغدیر", "company": "بین المللی توسعه ص. معادن غدیر", "industry": "سرمایه گذاری"}, {"symbol": "پکویر", "company": "کویر تایر", "industry": "لاستیک و پلاستیک"}, {"symbol": "سفارس", "company": "سیمان فارس و خوزستان", "industry": "سرمایه گذاری"}, {"symbol": "تماوند", "company": "تامین سرمایه دماوند", "industry": "تامین سرمایه"}, {"symbol": "کمینا", "company": "شیشه سازی مینا", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "سیتا", "company": "سرمایه گذاری سیمان تامین", "industry": "سرمایه گذاری"}, {"symbol": "وپسا", "company": "گ.س.پتروشیمی ساختمان خلیج فارس", "industry": "سرمایه گذاری"}, {"symbol": "سشرق", "company": "سیمان‌ شرق‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "تفارس", "company": "تامین سرمایه خلیج فارس", "industry": "تامین سرمایه"}, {"symbol": "زماهان", "company": "مجتمع تولید گوشت مرغ ماهان", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "وبوعلی", "company": "سرمایه‌گذاری‌بوعلی‌", "industry": "سرمایه گذاری"}, {"symbol": "وشمال", "company": "س. چشم انداز توسعه شمال", "industry": "سرمایه گذاری"}, {"symbol": "غگلستا", "company": "شیر پاستوریزه پگاه گلستان", "industry": "محصولات لبنی"}, {"symbol": "رکیش", "company": "کارت اعتباری ایران کیش", "industry": "نرم افزار و خدمات"}, {"symbol": "سخزر", "company": "سیمان‌ خزر", "industry": "سیمان، اهک و گچ"}, {"symbol": "میدکو", "company": "توسعه معادن وص.معدنی خاورمیانه", "industry": "سرمایه گذاری"}, {"symbol": "دامین", "company": "داروسازی‌ امین‌", "industry": "دارویی"}, {"symbol": "تیپیکو", "company": "سرمایه گذاری دارویی تامین", "industry": "سرمایه گذاری"}, {"symbol": "ولغدر", "company": "لیزینگ‌خودروغدیر", "industry": "لیزینگ"}, {"symbol": "وصنعت", "company": "سرمایه گذاری توسعه صنعت وتجارت", "industry": "سرمایه گذاری"}, {"symbol": "ولصنم", "company": "لیزینگ‌صنعت‌ومعدن‌", "industry": "لیزینگ"}, {"symbol": "اپال", "company": "فرآوری معدنی اپال کانی پارس", "industry": "سرمایه گذاری"}, {"symbol": "بانیان", "company": "نیان باتری خاوران", "industry": "ماشین الات الکتریکی"}, {"symbol": "ولقمان", "company": "گروه سرمایه گذاری لقمان", "industry": "سرمایه گذاری"}, {"symbol": "شملی", "company": "ملی شیمی کشاورز", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "ولملت", "company": "واسپاری ملت", "industry": "لیزینگ"}, {"symbol": "شاراک", "company": "پتروشیمی شازند", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "ولیز", "company": "لیزینگ ایران", "industry": "لیزینگ"}, {"symbol": "شصدف", "company": "صنعتی دوده فام", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "حتاید", "company": "تایدواترخاورمیانه", "industry": "بنادر و کشتیرانی"}, {"symbol": "تلیسه", "company": "دامداری تلیسه نمونه", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "دروز", "company": "داروسازی‌ روزدارو", "industry": "دارویی"}, {"symbol": "فزرین", "company": "زرین معدن آسیا", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "قتربت", "company": "قند تربت حیدریه", "industry": "شکر"}, {"symbol": "غزر", "company": "صنعتی زر ماکارون", "industry": "سایر محصولات غذایی"}, {"symbol": "غانیزان", "company": "فرآورده های دامی ولبنی دالاهو", "industry": "محصولات لبنی"}, {"symbol": "کلوند", "company": "کاشی‌ الوند", "industry": "کاشی و سرامیک"}, {"symbol": "چدن", "company": "تولیدی چدن سازان", "industry": "محصولات فلزی"}, {"symbol": "خشرق", "company": "الکتریک‌ خودرو شرق‌", "industry": "قطعات خودرو"}, {"symbol": "مادیرا", "company": "صنایع مادیران", "industry": "سخت افزار و تجهیزات"}, {"symbol": "بمپنا", "company": "تولید برق عسلویه  مپنا", "industry": "خدمات رفاهی-برق "}, {"symbol": "بموتو", "company": "موتوژن‌", "industry": "ماشین الات الکتریکی"}, {"symbol": "کاریز", "company": "بیمه زندگی کاریزما", "industry": "بیمه"}, {"symbol": "نماد", "company": "گروه مالی نماد غدیر", "industry": "سرمایه گذاری"}, {"symbol": "کمرجان", "company": "بازرگانی و تولیدی مرجان کار", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "کیمیاتک", "company": "آریان کیمیا تک", "industry": "محصولات پاک کننده"}, {"symbol": "ولشرق", "company": "لیزینگ ایران و شرق", "industry": "لیزینگ"}, {"symbol": "غگیلا", "company": "شیرپاستوریزه پگاه گیلان", "industry": "محصولات لبنی"}, {"symbol": "گکوثر", "company": "هتل پارسیان کوثر اصفهان", "industry": "هتل و رستوران"}, {"symbol": "وآرین", "company": "گروه توسعه اقتصادی آرین", "industry": "سرمایه گذاری"}, {"symbol": "بکام", "company": "کارخانجات تولیدی شهید قندی", "industry": "تجهیزات صنعتی"}, {"symbol": "پردیس", "company": "سرمایه گذاری پردیس", "industry": "سرمایه گذاری"}, {"symbol": "سنیر", "company": "سیمان‌ سفید نی‌ریز", "industry": "سیمان، اهک و گچ"}, {"symbol": "ثتوسا", "company": "س.توسعه و عمران استان اردبیل", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "پی پاد", "company": "پرداخت الکترونیک پاسارگاد", "industry": "نرم افزار و خدمات"}, {"symbol": "پلوله", "company": "گازلوله‌", "industry": "لاستیک و پلاستیک"}, {"symbol": "وجامی", "company": "سرمایه گذاری جامی", "industry": "سرمایه گذاری"}, {"symbol": "زفجر", "company": "کشاورزی و دامپروری فجر اصفهان", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "وکبهمن", "company": "مدیریت سرمایه گذاری کوثربهمن", "industry": "سرمایه گذاری"}, {"symbol": "ویسا", "company": "سرمایه گذاری ایساتیس پویا", "industry": "سرمایه گذاری"}, {"symbol": "قنیشا", "company": "قند  نیشابور", "industry": "شکر"}, {"symbol": "جوین", "company": "کشت و صنعت جوین", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "دجابر", "company": "داروسازی‌ جابرابن‌حیان‌", "industry": "دارویی"}, {"symbol": "سیستم", "company": "همکاران سیستم", "industry": "نرم افزار و خدمات"}, {"symbol": "کفپارس", "company": "فرآورده‌های‌ نسوز پارس‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "شستان", "company": "پتروشیمی شهید رئیسی گلستان", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "خاور", "company": "ایران خودرو دیزل", "industry": "خودرو"}, {"symbol": "غشوکو", "company": "شوکو پارس", "industry": "شیرینیجات"}, {"symbol": "داراب", "company": "پتروشیمی داراب", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "اعتلا", "company": "شرکت سرمایه گذاری اعتلاء البرز", "industry": "سرمایه گذاری"}, {"symbol": "لطیف", "company": "محصولات کاغذی لطیف", "industry": "محصولات کاغذی"}, {"symbol": "لکما", "company": "کارخانجات‌مخابراتی‌ایران‌", "industry": "تجهیزات مخابراتی"}, {"symbol": "ودی", "company": "بیمه  دی", "industry": "بیمه"}, {"symbol": "فروس", "company": "فروسیلیس‌ ایران‌", "industry": "آهن و فولاد"}, {"symbol": "درپاد", "company": "گروه صنعتی درپاد تبریز", "industry": "آهن و فولاد"}, {"symbol": "استقلال", "company": "استقلال", "industry": "فعاليتهاي فرهنگي و ورزشي"}, {"symbol": "شاملا", "company": "معدنی‌ املاح‌  ایران‌", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "دکپسول", "company": "تولید ژلاتین کپسول ایران", "industry": "دارویی"}, {"symbol": "فالوم", "company": "آلومتک", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "فجوش", "company": "جوش‌ و اکسیژن‌ ایران‌", "industry": "محصولات فلزی"}, {"symbol": "دماوند", "company": "تولید نیروی برق دماوند", "industry": "خدمات رفاهی-برق "}, {"symbol": "کولان", "company": "کولان سل", "industry": "محصولات کاغذی"}, {"symbol": "نیرو", "company": "نیرو سرمایه", "industry": "سرمایه گذاری"}, {"symbol": "زنجان", "company": "صنایع کشاورزی وکود زنجان", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "فسبزوار", "company": "پارس فولاد سبزوار", "industry": "آهن و فولاد"}, {"symbol": "ما", "company": "بیمه  ما", "industry": "بیمه"}, {"symbol": "زقیام", "company": "کشت و دام قیام اصفهان", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "سدور", "company": "سیمان‌ دورود", "industry": "سیمان، اهک و گچ"}, {"symbol": "معیار", "company": "سرمایه گذاری معیار صنعت پارس", "industry": "سرمایه گذاری"}, {"symbol": "وپخش", "company": "داروپخش‌ (هلدینگ‌", "industry": "سرمایه گذاری"}, {"symbol": "خپویش", "company": "سازه‌ پویش‌", "industry": "قطعات خودرو"}, {"symbol": "شبصیر", "company": "تولیدات پتروشیمی قائد بصیر", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "مارون", "company": "پتروشیمی مارون", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "غمهرا", "company": "تولیدی‌مهرام‌", "industry": "سایر محصولات غذایی"}, {"symbol": "درهآور", "company": "دارویی ره آورد تامین", "industry": "دارویی"}, {"symbol": "کتوکا", "company": "تولیدی و خدمات صنایع نسوز توکا", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "ددام", "company": "داروسازی زاگرس فارمد پارس", "industry": "دارویی"}, {"symbol": "شکام", "company": "صنایع شیمیایی کیمیاگران امروز", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "لخزر", "company": "پارس‌ خزر", "industry": "وسایل خانگی"}, {"symbol": "غشصفا", "company": "شیرپاستوریزه‌پگاه‌اصفهان‌", "industry": "محصولات لبنی"}, {"symbol": "ودانا", "company": "سرمایه گذاری دانایان", "industry": "سرمایه گذاری"}, {"symbol": "سفانو", "company": "سیمان فارس نو", "industry": "سیمان، اهک و گچ"}, {"symbol": "کرومیت", "company": "توسعه معادن کرومیت کاوندگان", "industry": "کانی های فلزی"}, {"symbol": "ثنور", "company": "سرمایه گذاری کوه نور", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "غگل", "company": "گلوکوزان‌", "industry": "سایر محصولات غذایی"}, {"symbol": "نمرینو", "company": "ایران‌ مرینوس‌", "industry": "نساجی"}, {"symbol": "قچار", "company": "فراوردههای غذایی وقند چهارمحال", "industry": "شکر"}, {"symbol": "دحاوی", "company": "الحاوی", "industry": "دارویی"}, {"symbol": "خلنت", "company": "لنت‌ ترمزایران‌", "industry": "قطعات خودرو"}, {"symbol": "فجام", "company": "جام‌دارو", "industry": "محصولات فلزی"}, {"symbol": "فروی", "company": "ذوب روی اصفهان", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "ثقزوی", "company": "شرکت عمران و سازندگی قزوین", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "خکرمان", "company": "سرمایه گذاری آرمان گستر پاریز", "industry": "سرمایه گذاری"}, {"symbol": "ثباغ", "company": "شهر سازی و خانه سازی باغمیشه", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "تکنو", "company": "تکنوتار", "industry": "ماشین الات"}, {"symbol": "ثتران", "company": "سرمایه گذاری مسکن تهران", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "پاریز", "company": "پاریز شرق", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "کساوه", "company": "صنایع‌ کاشی‌ و سرامیک‌ سینا", "industry": "کاشی و سرامیک"}, {"symbol": "حشکوه", "company": "دلیجان طلایی شکوه پارس", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "دسینا", "company": "داروسازی‌ سینا", "industry": "دارویی"}, {"symbol": "سغدیر", "company": "توسعه سرمایه و صنعت غدیر", "industry": "سرمایه گذاری"}, {"symbol": "عالیس", "company": "بهار رز عالیس چناران", "industry": "محصولات لبنی"}, {"symbol": "ثجوان", "company": "تامین مسکن جوانان", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "باران", "company": "بیمه زندگی باران", "industry": "بیمه"}, {"symbol": "وصندوق", "company": "سرمایه‌گذاری‌صندوق‌بازنشستگی‌", "industry": "سرمایه گذاری"}, {"symbol": "خپارس", "company": "پارس خودرو", "industry": "خودرو"}, {"symbol": "فروسیل", "company": "فروسیلیسیم خمین", "industry": "آهن و فولاد"}, {"symbol": "وسنا", "company": "سرمایه گذاری نیروگاهی ایران", "industry": "سرمایه گذاری"}, {"symbol": "زفارس", "company": "کشت وصنعت و دامپروری پگاه فارس", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "گکیش", "company": "توریستی ورفاهی آبادگران کیش", "industry": "هتل و رستوران"}, {"symbol": "شدوص", "company": "دوده‌ صنعتی‌ پارس‌", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "غشاذر", "company": "پگاه‌آذربایجان‌غربی‌", "industry": "محصولات لبنی"}, {"symbol": "اروند", "company": "پتروشیمی اروند", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "واتی", "company": "سرمایه‌ گذاری‌ آتیه‌ دماوند", "industry": "سرمایه گذاری"}, {"symbol": "بزاگرس", "company": "نیروگاه زاگرس کوثر", "industry": "خدمات رفاهی-برق "}, {"symbol": "دشیمی", "company": "شیمی‌ داروئی‌ داروپخش‌", "industry": "دارویی"}, {"symbol": "زشریف", "company": "کشت وصنعت شریف آباد", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "شاروم", "company": "پتروشیمی ارومیه", "industry": "تولید کود و ترکیبات نیتروژن"}, {"symbol": "خبنیان", "company": "بنیان دیزل", "industry": "قطعات خودرو"}, {"symbol": "سیدکو", "company": "سرمایه گذاری توسعه صنایع سیمان", "industry": "سرمایه گذاری"}, {"symbol": "شجم", "company": "صنایع پتروشیمی تخت جمشید", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "سصوفی", "company": "سیمان‌ صوفیان‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "خریخت", "company": "صنایع‌ریخته‌گری‌ایران‌", "industry": "قطعات خودرو"}, {"symbol": "سهرمز", "company": "سیمان‌هرمزگان‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "غمایه", "company": "شرکت خمیرمایه رضوی", "industry": "شیرینیجات"}, {"symbol": "اخشان", "company": "اخشان خراسان", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "غسالم", "company": "سالمین‌", "industry": "شیرینیجات"}, {"symbol": "کپارس", "company": "کاشی‌ پارس‌", "industry": "کاشی و سرامیک"}, {"symbol": "وتعاون", "company": "بیمه تعاون", "industry": "بیمه"}, {"symbol": "ثالوند", "company": "سرمایه گذاری مسکن الوند", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "شپترو", "company": "پتروشیمی آبادان", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "لازما", "company": "کارخانه های صنعتی آزمایش", "industry": "وسایل خانگی"}, {"symbol": "زشگزا", "company": "شیر و گوشت زاگرس شهرکرد", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "کیمازی", "company": "کیمیا کالای رازی", "industry": "دارویی"}, {"symbol": "فهامون", "company": "آلیاژ گستر هامون", "industry": "آهن و فولاد"}, {"symbol": "سکارون", "company": "سیمان کارون", "industry": "سیمان، اهک و گچ"}, {"symbol": "فاراک", "company": "ماشین‌ سازی‌ اراک‌", "industry": "محصولات فلزی"}, {"symbol": "بهامرز", "company": "بیمه زندگی هامرز", "industry": "بیمه"}, {"symbol": "شیراز", "company": "پتروشیمی‌شیراز", "industry": "تولید کود و ترکیبات نیتروژن"}, {"symbol": "بزندگی", "company": "بیمه زندگی آگاه", "industry": "بیمه"}, {"symbol": "چفیبر", "company": "تولید فیبر ایران‌", "industry": "چوب"}, {"symbol": "کیانا", "company": "گروه مالی کیان", "industry": "سرمایه گذاری"}, {"symbol": "شرنگی", "company": "شیمیایی رنگین", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "ثشرق", "company": "سرمایه گذاری مسکن شمال شرق", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "پلاست", "company": "کارخانجات تولیدی پلاستیران", "industry": "لاستیک و پلاستیک"}, {"symbol": "سشمال", "company": "سیمان‌ شمال‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "غگلپا", "company": "شیر پاستوریزه پگاه گلپایگان", "industry": "محصولات لبنی"}, {"symbol": "بسویچ", "company": "پارس‌سویچ‌", "industry": "ماشین الات الکتریکی"}, {"symbol": "وآوا", "company": "سرمایه گذاری آوا نوین", "industry": "سرمایه گذاری"}, {"symbol": "تکمبا", "company": "کمباین‌ سازی‌ ایران‌", "industry": "ماشین الات"}, {"symbol": "داوه", "company": "داروسازی آوه سینا", "industry": "دارویی"}, {"symbol": "فمراد", "company": "آلومراد", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "سآبیک", "company": "سیمان آبیک", "industry": "سیمان، اهک و گچ"}, {"symbol": "کویر", "company": "تولیدی فولاد سپید فراب کویر", "industry": "آهن و فولاد"}, {"symbol": "فوکا", "company": "فولاد کاویان", "industry": "آهن و فولاد"}, {"symbol": "شارپیلن", "company": "پتروشیمی ارغوان گسترایلام", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "بهپاک", "company": "صنعتی بهپاک", "industry": "سایر محصولات غذایی"}, {"symbol": "غفارس", "company": "شیر پاستوریزه پگاه فارس", "industry": "محصولات لبنی"}, {"symbol": "وفردا", "company": "بیمه هوشمند فردا", "industry": "بیمه"}, {"symbol": "گشان", "company": "توسعه بین المللی پدیده شاندیز", "industry": "سرمایه گذاری"}, {"symbol": "شکلر", "company": "نیروکلر", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "تمحرکه", "company": "ماشین سازی نیرو محرکه", "industry": "ماشین الات"}, {"symbol": "سمازن", "company": "سیمان‌مازندران‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "شتوکا", "company": "توکا رنگ فولاد سپاهان", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "آواک", "company": "صنایع ارتباطی آوا", "industry": "مخابرات"}, {"symbol": "خصدرا", "company": "صنعتی‌ دریایی‌ ایران‌", "industry": "پیمانکاری صنعتی"}, {"symbol": "آسیا", "company": "بیمه آسیا", "industry": "بیمه"}, {"symbol": "پاسا", "company": "ایران‌یاساتایرورابر", "industry": "لاستیک و پلاستیک"}, {"symbol": "حگردش", "company": "ریل گردش ایرانیان", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "فرود", "company": "فولاد شاهرود", "industry": "آهن و فولاد"}, {"symbol": "کازرو", "company": "پتروشیمی کازرون", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "شرانل", "company": "نفت ایرانول", "industry": "فراورده های نفتی"}, {"symbol": "غپآذر", "company": "شیر پگاه آذربایجان شرقی", "industry": "محصولات لبنی"}, {"symbol": "کپرور", "company": "فرآوری زغال سنگ پروده طبس", "industry": "زغال سنگ"}, {"symbol": "هانیکو", "company": "هامون نایزه", "industry": "محصولات فلزی"}, {"symbol": "کانسار", "company": "معدنکاران نسوز", "industry": "سایر مواد معدنی"}, {"symbol": "آینده", "company": "بازرگانی آینده سازان بهشت پارس", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "جم پیلن", "company": "پتروشیمی جم پیلن", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "وسالت", "company": "بانک قرض الحسنه رسالت", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "قشیر", "company": "قند شیروان قوچان و بجنورد", "industry": "شکر"}, {"symbol": "چخزر", "company": "صنایع چوب خزر کاسپین", "industry": "چوب"}, {"symbol": "کتوسعه", "company": "توسعه صنایع و معادن کوثر", "industry": "سایر مواد معدنی"}, {"symbol": "آبادا", "company": "تولید نیروی برق آبادان", "industry": "خدمات رفاهی-برق "}, {"symbol": "فجهان", "company": "جهان فولاد سیرجان", "industry": "آهن و فولاد"}, {"symbol": "کایزد", "company": "فرانسوز یزد", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "بگیلان", "company": "توسعه مسیر برق گیلان", "industry": "خدمات رفاهی-برق "}, {"symbol": "سپیدار", "company": "سپیدار سیستم آسیا", "industry": "نرم افزار و خدمات"}, {"symbol": "کصدف", "company": "کاشی صدف سرام استقلال آباده", "industry": "کاشی و سرامیک"}, {"symbol": "ثشاهد", "company": "سرمایه‌ گذاری‌ شاهد", "industry": "سرمایه گذاری"}, {"symbol": "فلات", "company": "گروه صنایع معادن فلات ایرانیان", "industry": "سرمایه گذاری"}, {"symbol": "فماک", "company": "ماداکتو استیل کرد", "industry": "آهن و فولاد"}, {"symbol": "ساروم", "company": "سیمان‌ارومیه‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "سبهان", "company": "سیمان‌ بهبهان‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "قهکمت", "company": "قندهکمتان‌", "industry": "شکر"}, {"symbol": "سباقر", "company": "سیمان باقران", "industry": "سیمان، اهک و گچ"}, {"symbol": "وپترو", "company": "سرمایه‌گذاری صنایع پتروشیمی‌", "industry": "سرمایه گذاری"}, {"symbol": "لپارس", "company": "پارس‌ الکتریک‌", "industry": "وسایل خانگی"}, {"symbol": "خمهر", "company": "مهرکام‌پارس‌", "industry": "قطعات خودرو"}, {"symbol": "بساما", "company": "بیمه سامان", "industry": "بیمه"}, {"symbol": "غپاک", "company": "لبنیات‌ پاک‌", "industry": "محصولات لبنی"}, {"symbol": "آردینه", "company": "نشاسته و گلوکز آردینه", "industry": "سایر محصولات غذایی"}, {"symbol": "چافست", "company": "افست‌", "industry": "چاپ و نشر"}, {"symbol": "بیوتیک", "company": "آنتی بیوتیک سازی ایران", "industry": "دارویی"}, {"symbol": "تکاردان", "company": "تامین سرمایه کاردان", "industry": "تامین سرمایه"}, {"symbol": "آپ", "company": "آسان پرداخت پرشین", "industry": "نرم افزار و خدمات"}, {"symbol": "ثعمرا", "company": "عمران و توسعه شاهد", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "کورز", "company": "ورزیران‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "اتکای", "company": "بیمه اتکایی ایرانیان", "industry": "بیمه"}, {"symbol": "غالبر", "company": "لبنیات‌ کالبر", "industry": "محصولات لبنی"}, {"symbol": "ومعلم", "company": "بیمه معلم", "industry": "بیمه"}, {"symbol": "غدشت", "company": "دشت‌ مرغاب‌", "industry": "سایر محصولات غذایی"}, {"symbol": "بپیوند", "company": "برق و انرژی پیوندگستر پارس", "industry": "خدمات رفاهی-برق "}, {"symbol": "نیشکر", "company": "توسعه نیشکر و  صنایع جانبی", "industry": "سرمایه گذاری"}, {"symbol": "وتوسکا", "company": "سرمایه گذاری توسعه توکا", "industry": "سرمایه گذاری"}, {"symbol": "بپویا", "company": "دانش محور پویا نیرو", "industry": "تجهیزات صنعتی"}, {"symbol": "قجام", "company": "فرآوردههای غذایی وقندتربت‌جام‌", "industry": "شکر"}, {"symbol": "خراسان", "company": "پتروشیمی خراسان", "industry": "تولید کود و ترکیبات نیتروژن"}, {"symbol": "آبین", "company": "کشت و صنعت آبشیرین", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "وهنر", "company": "گروه توسعه هنر ایران", "industry": "سرمایه گذاری"}, {"symbol": "غنوش", "company": "نوش‌ مازندران‌", "industry": "سایر محصولات غذایی"}, {"symbol": "ولبهمن", "company": "شرکت بهمن لیزینگ", "industry": "لیزینگ"}, {"symbol": "وساپا", "company": "سرمایه‌گذاری‌ سایپا", "industry": "سرمایه گذاری"}, {"symbol": "سبجنو", "company": "سیمان‌ بجنورد", "industry": "سیمان، اهک و گچ"}, {"symbol": "سصفها", "company": "سیمان‌اصفهان‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "ثعتما", "company": "س. ساختمانی اعتماد گستر", "industry": "سرمایه گذاری"}, {"symbol": "آریا", "company": "پلیمر آریا ساسول", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "بهیر", "company": "س. توسعه تجارت هیرمند", "industry": "سرمایه گذاری"}, {"symbol": "لسرما", "company": "سرما آفرین‌", "industry": "ماشین الات"}, {"symbol": "خفناور", "company": "مهندسی صنعتی روان فن آور", "industry": "قطعات خودرو"}, {"symbol": "وایران", "company": "لیزینگ ایرانیان", "industry": "لیزینگ"}, {"symbol": "دفرا", "company": "فرآورده‌های‌ تزریقی‌ ایران‌", "industry": "دارویی"}, {"symbol": "ساروج", "company": "بین المللی ساروج بوشهر", "industry": "سیمان، اهک و گچ"}, {"symbol": "سیمرغ", "company": "سیمرغ", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "ممسنی", "company": "پتروشیمی ممسنی", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "فرآور", "company": "فرآوری‌موادمعدنی‌ایران‌", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "لپیام", "company": "گسترش صنایع پیام", "industry": "سرمایه گذاری"}, {"symbol": "کماسه", "company": "تامین‌ ماسه‌ ریخته‌گری‌", "industry": "سایر مواد معدنی"}, {"symbol": "فاهواز", "company": "نورد و لوله اهواز", "industry": "آهن و فولاد"}, {"symbol": "شپاس", "company": "نفت پاسارگاد", "industry": "فراورده های نفتی"}, {"symbol": "پسهند", "company": "صنایع‌ لاستیکی‌  سهند", "industry": "لاستیک و پلاستیک"}, {"symbol": "ثنوسا", "company": "نوسازی‌وساختمان‌تهران‌", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "سمتاز", "company": "سیمان ممتازان کرمان", "industry": "سیمان، اهک و گچ"}, {"symbol": "تشتاد", "company": "صنایع تولیدی اشتاد ایران‌", "industry": "قطعات خودرو"}, {"symbol": "زمگسا", "company": "کشاورزی‌ ودامپروی‌ مگسال‌", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "سکرد", "company": "سیمان کردستان", "industry": "سیمان، اهک و گچ"}, {"symbol": "کگاز", "company": "شیشه‌ و گاز", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "بکابل", "company": "سیم و کابل ابهر", "industry": "تجهیزات صنعتی"}, {"symbol": "زپارس", "company": "ملی کشت و صنعت و دامپروری پارس", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "وآیند", "company": "بانک  آینده", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "قشهد", "company": "شهد", "industry": "شکر"}, {"symbol": "زکشت", "company": "کشاورزی مکانیزه اصفهان کشت", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "فسا", "company": "پتروشیمی فسا", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "نطرین", "company": "عطرین نخ قم", "industry": "نساجی"}, {"symbol": "پدرخش", "company": "درخشان‌ تهران‌", "industry": "لاستیک و پلاستیک"}, {"symbol": "وآذر", "company": "سرمایه‌گذاری‌توسعه‌آذربایجان‌", "industry": "سرمایه گذاری"}, {"symbol": "محتشم", "company": "نساجی هدیه البرز مشهد", "industry": "نساجی"}, {"symbol": "ساراب", "company": "سیمان‌ داراب‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "سهگمت", "company": "سیمان‌هگمتان‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "رافزا", "company": "رایان هم افزا", "industry": "نرم افزار و خدمات"}, {"symbol": "وآفر", "company": "سرمایه گذاری ارزش آفرینان", "industry": "سرمایه گذاری"}, {"symbol": "شکبیر", "company": "پتروشیمی امیرکبیر", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "ومشان", "company": "سرمایه گذاری مشانیر", "industry": "سرمایه گذاری"}, {"symbol": "تکشا", "company": "گسترش‌صنایع‌وخدمات‌کشاورزی‌", "industry": "ماشین الات"}, {"symbol": "فبستم", "company": "صنایع ‌بسته‌بندی‌ مشهد", "industry": "محصولات فلزی"}, {"symbol": "داتام", "company": "گروه مالی داتام", "industry": "سرمایه گذاری"}, {"symbol": "غبهنوش", "company": "بهنوش‌ ایران‌", "industry": "نوشیدنی"}, {"symbol": "خاذین", "company": "سایپاآذین‌", "industry": "قطعات خودرو"}, {"symbol": "قپیرا", "company": "فرآورده‌های‌غدایی‌وقندپیرانشهر", "industry": "شکر"}, {"symbol": "ثاصفا", "company": "شرکت‌ ساختمان‌ اصفهان‌", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "سدبیر", "company": "س. تدبیرگران فارس وخوزستان", "industry": "سرمایه گذاری"}, {"symbol": "حپترو", "company": "حمل و نقل پتروشیمی( سهامی عام", "industry": "حمل و نقل بار زمینی"}, {"symbol": "گنگین", "company": "گروه اقتصادی مالی نگین", "industry": "سرمایه گذاری"}, {"symbol": "تاتمس", "company": "کارخانجات صنعتی وتولیدی اتمسفر", "industry": "ماشین الات"}, {"symbol": "کطبس", "company": "ذغال‌سنگ‌ نگین‌ ط‌بس‌", "industry": "زغال سنگ"}, {"symbol": "کدما", "company": "معدنی‌ دماوند", "industry": "کانی های فلزی"}, {"symbol": "سکرما", "company": "سیمان‌ کرمان‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "کشرق", "company": "صنعتی و معدنی شمال شرق شاهرود", "industry": "زغال سنگ"}, {"symbol": "ساربیل", "company": "سیمان آرتا اردبیل", "industry": "سیمان، اهک و گچ"}, {"symbol": "رپویا", "company": "پویا", "industry": "نرم افزار و خدمات"}, {"symbol": "غدام", "company": "خوراک‌  دام‌ پارس‌", "industry": "سایر محصولات غذایی"}, {"symbol": "سیلام", "company": "سیمان‌ ایلام‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "بالاس", "company": "مهندسی ساختمان تاسیسات راه آهن", "industry": "پیمانکاری صنعتی"}, {"symbol": "قیستو", "company": "شرکت قند بیستون", "industry": "شکر"}, {"symbol": "سپ", "company": "پرداخت الکترونیک سامان کیش", "industry": "نرم افزار و خدمات"}, {"symbol": "خفولا", "company": "خدمات فنی فولاد یزد", "industry": "فعالیت مهندسی"}, {"symbol": "وبرق", "company": "س.کارکنان صنعت برق زنجان وقزوی", "industry": "سرمایه گذاری"}, {"symbol": "فکمند", "company": "گسترش قطعه سازی کمند", "industry": "محصولات فلزی"}, {"symbol": "وتوس", "company": "توسعه‌شهری‌توس‌گستر", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "بکاب", "company": "صنایع‌جوشکاب‌یزد", "industry": "تجهیزات صنعتی"}, {"symbol": "رفاه", "company": "فروشگاه های زنجیره ای رفاه", "industry": "خرده فروشی،باستثنای وسایل نقلیه موتوری"}, {"symbol": "کسرام", "company": "پارس‌ سرام‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "بالبر", "company": "کابل‌ البرز", "industry": "تجهیزات صنعتی"}, {"symbol": "ومپنا", "company": "مدیریت نیروگاهی ایرانیان مپنا", "industry": "سرمایه گذاری"}, {"symbol": "تکنار", "company": "مجتمع معادن مس تکنار", "industry": "کانی های فلزی"}, {"symbol": "وملی", "company": "گروه‌ صنعتی‌ ملی‌ (هلدینگ‌", "industry": "سرمایه گذاری"}, {"symbol": "شلیا", "company": "شرکت مواد ویژه لیا", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "شگامرن", "company": "مجتمع پترو صنعت گامرون", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "کابگن", "company": "تولیدی و صنعتی آبگینه‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "ریشمک", "company": "تولید و صادرات ریشمک", "industry": "دارویی"}, {"symbol": "تبرک", "company": "گروه کارخانجات صنعتی تبرک", "industry": "سرمایه گذاری"}, {"symbol": "لخانه", "company": "لوازم‌ خانگی‌ پارس‌", "industry": "وسایل خانگی"}, {"symbol": "دشیری", "company": "شیرین دارو", "industry": "دارویی"}, {"symbol": "غشهد", "company": "شهد ایران ‌", "industry": "سایر محصولات غذایی"}, {"symbol": "آلومینا", "company": "آلومینای ایران", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "کباده", "company": "تولید خاک نسوزاستقلال آباده", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "خمحور", "company": "تولیدمحورخودرو", "industry": "قطعات خودرو"}, {"symbol": "رتکو", "company": "کنترل ‌خوردگی ‌تکین ‌کوی", "industry": "فعالیت مهندسی"}, {"symbol": "تپمپی", "company": "پمپ‌ سازی‌ ایران‌", "industry": "سرمایه گذاری"}, {"symbol": "زاگرس", "company": "پتروشیمی زاگرس", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "غاذر", "company": "کشت‌وصنعت‌پیاذر", "industry": "سایر محصولات غذایی"}, {"symbol": "قزوین", "company": "کارخانجات‌ قند قزوین‌", "industry": "شکر"}, {"symbol": "کبافق", "company": "معادن‌ بافق‌", "industry": "کانی های فلزی"}, {"symbol": "سفار", "company": "سیمان‌فارس‌", "industry": "سیمان، اهک و گچ"}, {"symbol": "کهرام", "company": "تولیدی گرانیت بهسرام", "industry": "کاشی و سرامیک"}, {"symbol": "سدشت", "company": "صنایع سیمان دشتستان", "industry": "سیمان، اهک و گچ"}, {"symbol": "خبازرس", "company": "بازرسی مهندسی و صنعتی ایران", "industry": "فعالیت مهندسی"}, {"symbol": "بتک", "company": "کارخانجات کابل سازی‌ تک‌", "industry": "تجهیزات صنعتی"}, {"symbol": "قلرست", "company": "قند لرستان‌", "industry": "شکر"}, {"symbol": "بایکا", "company": "کارخانجات کابلسازی ‌ایران‌", "industry": "تجهیزات صنعتی"}, {"symbol": "کایتا", "company": "ایتالران‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "جم", "company": "پتروشیمی جم", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "دلقما", "company": "دارویی‌ لقمان‌", "industry": "دارویی"}, {"symbol": "وساربیل", "company": "شرکت س استان اردبیل", "industry": "سرمایه گذاری استانی"}, {"symbol": "سنوین", "company": "سرمایه گذاری اقتصاد نوین", "industry": "سرمایه گذاری"}, {"symbol": "ومعادن", "company": "توسعه‌معادن‌وفلزات‌", "industry": "سرمایه گذاری"}, {"symbol": "فپنتا", "company": "سپنتا", "industry": "آهن و فولاد"}, {"symbol": "وامید", "company": "گروه مدیریت سرمایه گذاری امید", "industry": "سرمایه گذاری"}, {"symbol": "واحصا", "company": "احیاء صنایع خراسان", "industry": "سرمایه گذاری"}, {"symbol": "وآتوس", "company": "گروه سرمایه گذاری توسکا", "industry": "سرمایه گذاری"}, {"symbol": "کرماشا", "company": "صنایع پتروشیمی کرمانشاه", "industry": "تولید کود و ترکیبات نیتروژن"}, {"symbol": "درازک", "company": "دارویی‌ رازک‌", "industry": "دارویی"}, {"symbol": "پشاهن", "company": "تولیدی پلاستیک‌ شاهین", "industry": "لاستیک و پلاستیک"}, {"symbol": "وسمرکز", "company": "شرکت س استان مرکزی", "industry": "سرمایه گذاری استانی"}, {"symbol": "ثفارس", "company": "عمران‌وتوسعه‌فارس‌", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "تفیرو", "company": "مهندسی فیروزا", "industry": "ماشین الات"}, {"symbol": "چنوپا", "company": "نیوپان‌ 22 بهمن‌", "industry": "چوب"}, {"symbol": "وسبوشهر", "company": "شرکت س استان بوشهر", "industry": "سرمایه گذاری استانی"}, {"symbol": "فاما", "company": "صنعتی‌ آما", "industry": "محصولات فلزی"}, {"symbol": "فنورد", "company": "نوردوقطعات‌ فولادی‌", "industry": "آهن و فولاد"}, {"symbol": "فولاد", "company": "فولاد مبارکه اصفهان", "industry": "آهن و فولاد"}, {"symbol": "ثنظام", "company": "س. ساختمانی نظام مهندسی ایران", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "شتهران", "company": "داروسازی تهران شیمی", "industry": "دارویی"}, {"symbol": "پارتا", "company": "مجتمع صنعتی آرتاویل تایر", "industry": "لاستیک و پلاستیک"}, {"symbol": "دکوثر", "company": "داروسازی‌ کوثر", "industry": "دارویی"}, {"symbol": "وسخراج", "company": "شرکت س استان خراسان جنوبی", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسیزد", "company": "شرکت س استان یزد", "industry": "سرمایه گذاری استانی"}, {"symbol": "بشهاب", "company": "لامپ‌  پارس‌ شهاب‌", "industry": "ماشین الات الکتریکی"}, {"symbol": "سامان", "company": "بانک سامان", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "خکاوه", "company": "سایپا دیزل", "industry": "خودرو"}, {"symbol": "دهدشت", "company": "صنایع پتروشیمی دهدشت", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "سفاسی", "company": "شرکت فارسیت اهواز", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "خنصیر", "company": "مهندسی‌نصیرماشین‌", "industry": "قطعات خودرو"}, {"symbol": "لابسا", "company": "آبسال‌", "industry": "ماشین الات"}, {"symbol": "ساذری", "company": "آذریت‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "افرا", "company": "افرانت", "industry": "مخابرات"}, {"symbol": "مرقام", "company": "ایران ارقام", "industry": "نرم افزار و خدمات"}, {"symbol": "بترانس", "company": "ایران‌ ترانسفو", "industry": "ماشین الات الکتریکی"}, {"symbol": "حذف -آرین", "company": "بانک الکترونیکی آرین", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "سمایه", "company": "بانک سرمایه", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "آرمان", "company": "بیمه آرمان", "industry": "بیمه"}, {"symbol": "وحافظ", "company": "بیمه حافظ", "industry": "بیمه"}, {"symbol": "وآفری", "company": "بیمه کارآفرین", "industry": "بیمه"}, {"symbol": "شبریز", "company": "پالایش نفت تبریز", "industry": "فراورده های نفتی"}, {"symbol": "شراز", "company": "پالایش نفت شیراز", "industry": "فراورده های نفتی"}, {"symbol": "شاوان", "company": "پالایش نفت لاوان", "industry": "فراورده های نفتی"}, {"symbol": "شصفها", "company": "پتروشیمی‌ اصفهان‌", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "جهرم", "company": "پتروشیمی جهرم", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "شخارک", "company": "پتروشیمی‌ خارک‌", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "شغدیر", "company": "پتروشیمی غدیر", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "شفارا", "company": "پتروشیمی فارابی", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "نتوس", "company": "پشم‌ بافی‌ توس", "industry": "نساجی"}, {"symbol": "پلاسک", "company": "پلاسکوکار", "industry": "لاستیک و پلاستیک"}, {"symbol": "وبشهر", "company": "توسعه‌ صنایع‌ بهشهر(هلدینگ", "industry": "سرمایه گذاری"}, {"symbol": "خچرخش", "company": "چرخشگر", "industry": "قطعات خودرو"}, {"symbol": "رانفور", "company": "خدمات‌انفورماتیک‌", "industry": "نرم افزار و خدمات"}, {"symbol": "حبندر", "company": "دریایی و کشتیرانی خط دریابندر", "industry": "بنادر و کشتیرانی"}, {"symbol": "ختور", "company": "رادیاتور ایران‌", "industry": "قطعات خودرو"}, {"symbol": "حرهشا", "company": "رهشاد سپاهان (سهامی عام", "industry": "حمل و نقل بار زمینی"}, {"symbol": "کساپا", "company": "سایپاشیشه‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "وساشرقی", "company": "شرکت س استان آذربایجان شرقی", "industry": "سرمایه گذاری استانی"}, {"symbol": "وساغربی", "company": "شرکت س استان آذربایجان غربی", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسصفا", "company": "شرکت س استان اصفهان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسخراش", "company": "شرکت س استان خراسان شمالی", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسخوز", "company": "شرکت س استان خوزستان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسزنجان", "company": "شرکت س استان زنجان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسیستا", "company": "شرکت س استان سیستان وبلوچستان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسفارس", "company": "شرکت س استان فارس", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسقم", "company": "شرکت س استان قم", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسگلستا", "company": "شرکت س استان گلستان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسگیلا", "company": "شرکت س استان گیلان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسکرد", "company": "شرکت س استان کردستان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسکهبو", "company": "س.عدالت ا. کهگیلویه وبویراحمد", "industry": "سرمایه گذاری استانی"}, {"symbol": "ثنام", "company": "س ساختمانی ب نام آوران مهندسی", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "وملت", "company": "سرمایه گذاری ملت", "industry": "سرمایه گذاری"}, {"symbol": "وثوق", "company": "سرمایه گذاری وثوق امین", "industry": "سرمایه گذاری"}, {"symbol": "زکوثر", "company": "سرمایه گذاری کشاورزی کوثر", "industry": "سرمایه گذاری"}, {"symbol": "سرچشمه", "company": "سرمایه گذاری مس سرچشمه", "industry": "سرمایه گذاری"}, {"symbol": "خمحرکه", "company": "نیرو محرکه‌", "industry": "قطعات خودرو"}, {"symbol": "فرابورس", "company": "فرابورس ایران", "industry": "فعالیتهای مرتبط با اوراق بهادار"}, {"symbol": "فافزا", "company": "فولاد افزا سپاهان", "industry": "آهن و فولاد"}, {"symbol": "فخوز", "company": "فولاد  خوزستان", "industry": "آهن و فولاد"}, {"symbol": "فسدید", "company": "لوله‌وتجهیزات‌ سدید", "industry": "آهن و فولاد"}, {"symbol": "ولانا", "company": "شرکت لیزینگ آریا دانا", "industry": "لیزینگ"}, {"symbol": "خلیبل", "company": "مالیبل سایپا", "industry": "قطعات خودرو"}, {"symbol": "گپارس", "company": "امور رفاهی کارگزاران پارس", "industry": "هتل و رستوران"}, {"symbol": "خوساز", "company": "محورسازان‌ایران‌خودرو", "industry": "قطعات خودرو"}, {"symbol": "نبروج", "company": "نساجی بروجرد", "industry": "نساجی"}, {"symbol": "نشار", "company": "کارخانجات پشمبافی افشار یزد", "industry": "نساجی"}, {"symbol": "سفارود", "company": "کارخانه فارسیت درود", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "شکربن", "company": "کربن‌ ایران‌", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "سخوز", "company": "سیمان خوزستان", "industry": "سیمان، اهک و گچ"}, {"symbol": "وسیلام", "company": "شرکت س استان ایلام", "industry": "سرمایه گذاری استانی"}, {"symbol": "کفرآور", "company": "فرآورده های سیمان شرق", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "وسهرمز", "company": "شرکت س استان هرمزگان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسهمدا", "company": "شرکت س استان همدان", "industry": "سرمایه گذاری استانی"}, {"symbol": "ثرود", "company": "سرمایه‌گذاری مسکن زاینده رود", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "ثزاگرس", "company": "سرمایه گذاری توسعه عمران زاگرس", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "خعمرا", "company": "توسعه و عمران شهرستان نائین", "industry": "قطعات خودرو"}, {"symbol": "مبین", "company": "مبین انرژی خلیج فارس", "industry": "خدمات رفاهی متنوع"}, {"symbol": "وثخوز", "company": "سرمایه گذاری و توسعه خوزستان", "industry": "سرمایه گذاری"}, {"symbol": "وملل", "company": "اعتباری ملل", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "فاذر", "company": "صنایع‌ آذرآب‌", "industry": "محصولات فلزی"}, {"symbol": "وسکرشا", "company": "س.سهام عدالت استان کرمانشاه", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسرضوی", "company": "س.سهام عدالت استان خراسان رضوی", "industry": "سرمایه گذاری استانی"}, {"symbol": "تابا", "company": "تابان نیرو سپاهان", "industry": "فعالیت مهندسی"}, {"symbol": "خکمک", "company": "کمک‌فنرایندامین‌", "industry": "قطعات خودرو"}, {"symbol": "تپولا", "company": "مهندسی مرآت پولاد", "industry": "فعالیت مهندسی"}, {"symbol": "قاروم", "company": "قند ارومیه", "industry": "شکر"}, {"symbol": "بفجر", "company": "فجر انرژی خلیج فارس", "industry": "خدمات رفاهی متنوع"}, {"symbol": "نخریس", "company": "نخریسی و نساجی خسروی خراسان", "industry": "نساجی"}, {"symbol": "وسکرمان", "company": "س.سهام عدالت استان کرمان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسمازن", "company": "س.سهام عدالت استان مازندران", "industry": "سرمایه گذاری استانی"}, {"symbol": "حریل", "company": "ریل پردازسیر", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "بکهنوج", "company": "تولید برق ماهتاب کهنوج", "industry": "خدمات رفاهی-برق "}, {"symbol": "غدیس", "company": "پاکدیس", "industry": "نوشیدنی"}, {"symbol": "وسلرستا", "company": "شرکت س استان لرستان", "industry": "سرمایه گذاری استانی"}, {"symbol": "ثجنوب", "company": "سرمایه گذاری مسکن جنوب", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "غگز", "company": "صنایع غذایی سکه", "industry": "شیرینیجات"}, {"symbol": "وحکمت", "company": "بیمه حکمت صبا", "industry": "بیمه"}, {"symbol": "پرداخت", "company": "به پرداخت ملت", "industry": "نرم افزار و خدمات"}, {"symbol": "کارام", "company": "صنایع سرام آرا", "industry": "کاشی و سرامیک"}, {"symbol": "غنیلی", "company": "مجتمع تولیدی نیلی صنعت کرمان", "industry": "سایر محصولات غذایی"}, {"symbol": "زملارد", "company": "کشاورزی و دامپروری ملارد شیر", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "کلر", "company": "کلر پارس", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "فافق", "company": "صنایع مس افق کرمان", "industry": "سرمایه گذاری"}, {"symbol": "وآداک", "company": "صنعت و تجارت آداک", "industry": "سرمایه گذاری"}, {"symbol": "زهلال", "company": "کشت و صنعت هلال", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "رنیک", "company": "جنرال مکانیک", "industry": "فعالیت مهندسی"}, {"symbol": "اردستان", "company": "سیمان اردستان", "industry": "سیمان، اهک و گچ"}, {"symbol": "حآفرین", "company": "ریل پرداز نو آفرین", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "کیا", "company": "کیا الکترود شرق", "industry": "محصولات فلزی"}, {"symbol": "غکورش", "company": "صنعت غذایی کورش", "industry": "سایر محصولات غذایی"}, {"symbol": "بازرگام", "company": "پست پیشگامان", "industry": "خرده فروشی،باستثنای وسایل نقلیه موتوری"}, {"symbol": "گلدیرا", "company": "صنایع گلدیران", "industry": "وسایل خانگی"}, {"symbol": "والماس", "company": "س. الماس حکمت ایرانیان", "industry": "سرمایه گذاری"}, {"symbol": "اتکاسا", "company": "بیمه اتکایی سامان", "industry": "بیمه"}, {"symbol": "پرسپولیس", "company": "پرسپولیس", "industry": "فعاليتهاي فرهنگي و ورزشي"}, {"symbol": "بتهران", "company": "بیمه اتکایی تهران رواک", "industry": "بیمه"}, {"symbol": "نبابک", "company": "نساجی بابکان", "industry": "نساجی"}, {"symbol": "حپرتو", "company": "پرتو بار فرابر خلیج فارس", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "رایا", "company": "بیمه اتکایی رایا", "industry": "بیمه"}, {"symbol": "خبرنا", "company": "تولیدی برنا باطری", "industry": "قطعات خودرو"}, {"symbol": "فطلوع", "company": "طلوع فولاد پارس", "industry": "آهن و فولاد"}, {"symbol": "کپرسپولیس", "company": "مجتمع کاشی و سنگ پرسپولیس یزد", "industry": "کاشی و سرامیک"}, {"symbol": "رهیاب", "company": "رهیاب پیام گستران", "industry": "نرم افزار و خدمات"}, {"symbol": "سینا", "company": "مالی و سرمایه گذاری سینا", "industry": "سرمایه گذاری"}, {"symbol": "حامیا", "company": "بیمه اتکایی حامی ما", "industry": "بیمه"}, {"symbol": "منور", "company": "منور", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "شسیماب", "company": "سیماب رزین", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "وسهند", "company": "سرمایه گذاری سرمایه گسترسهند", "industry": "سرمایه گذاری"}, {"symbol": "سایرا", "company": "ایرانیت‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "سپرده", "company": "سپرده گذاری مرکزی و تسویه وجوه", "industry": "فعالیتهای مرتبط با اوراق بهادار"}, {"symbol": "برانس", "company": "ایران ترانسفو ری", "industry": "ماشین الات الکتریکی"}, {"symbol": "وزمین", "company": "بانک ایران زمین", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "ورفاه", "company": "بانک رفاه کارگران", "industry": "بانکها و موسسات اعتباری"}, {"symbol": "سپرمی", "company": "پرمیت‌", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "شزنگ", "company": "تجهیزنیروی‌زنگان‌", "industry": "فراورده های نفتی"}, {"symbol": "شسم", "company": "تولید سموم‌ علف‌ کش", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "منجیل", "company": "تولید نیروی برق سبز منجیل", "industry": "خدمات رفاهی-برق "}, {"symbol": "حقشم", "company": "دریایی و مهندسی کشتیرانی قشم", "industry": "سایر فعالیت های پشتیبانی و حمل و نقل"}, {"symbol": "وآوین", "company": "سرمایه گذاری آوین", "industry": "سرمایه گذاری"}, {"symbol": "تدبیر", "company": "گروه سرمایه گذاری تدبیر", "industry": "سرمایه گذاری"}, {"symbol": "ثعمسا", "company": "عمران و مسکن سازان ایران", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "اجداد", "company": "مرغ اجداد زربال", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "شجی", "company": "شرکت نفت جی", "industry": "فراورده های نفتی"}, {"symbol": "حفجر", "company": "کشتیرانی  والفجر", "industry": "بنادر و کشتیرانی"}, {"symbol": "ومعین", "company": "سرمایه گذاری توسعه معین ملت", "industry": "سرمایه گذاری"}, {"symbol": "ولامید", "company": "شرکت لیزینگ امید", "industry": "لیزینگ"}, {"symbol": "تمدن", "company": "تامین سرمایه تمدن", "industry": "تامین سرمایه"}, {"symbol": "وسمحال", "company": "شرکت س.استان چهارمحال وبختیاری", "industry": "سرمایه گذاری استانی"}, {"symbol": "وتبار", "company": "سرمایه گذاری تبار ثامن", "industry": "سرمایه گذاری"}, {"symbol": "وستهران", "company": "شرکت س استان تهران", "industry": "سرمایه گذاری استانی"}, {"symbol": "وکمپنا", "company": "سرمایه گذاری ثروت آفرین صبا", "industry": "سرمایه گذاری"}, {"symbol": "چرمش", "company": "شرکت چرم مشهد", "industry": "چرم"}, {"symbol": "کنگار", "company": "کاشی و سرامیک نگار گستر جلگه", "industry": "کاشی و سرامیک"}, {"symbol": "بصبا", "company": "تولید نیروی جنوب غرب صبا", "industry": "خدمات رفاهی-برق "}, {"symbol": "وسمنان", "company": "شرکت س استان سمنان", "industry": "سرمایه گذاری استانی"}, {"symbol": "وسقزوین", "company": "سرمایه گذاری عدالت استان قزوین", "industry": "سرمایه گذاری استانی"}, {"symbol": "حرهور", "company": "مجتمع ترابری رهنورد", "industry": "حمل و نقل بار زمینی"}, {"symbol": "برانسفو", "company": "ترانسفورماتور توزیع زنگان", "industry": "ماشین الات الکتریکی"}, {"symbol": "توربو", "company": "توربو کمپرسور نفت", "industry": "ماشین الات"}, {"symbol": "سفاروم", "company": "سیمان سفید ارومیه", "industry": "سیمان، اهک و گچ"}, {"symbol": "پرشیا", "company": "توسعه صنعت نفت و گاز پرشیا", "industry": "حفاری"}, {"symbol": "ثملی", "company": "بین المللی ساختمان و صنعت ملی", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "غکولاک", "company": "کولاک‌ شرق‌", "industry": "نوشیدنی"}, {"symbol": "خاذر", "company": "تولیدی آذر باتری ارومیه", "industry": "قطعات خودرو"}, {"symbol": "حرآهن", "company": "راه آهن حمل ونقل", "industry": "حمل و نقل از طریق خطوط راه اهن"}, {"symbol": "بسته بندی", "company": "بسته بندی فرآورده شیری پگاه", "industry": "لاستیک و پلاستیک"}, {"symbol": "شیرخشک", "company": "شیرخشک نوزاد پگاه", "industry": "سایر محصولات غذایی"}, {"symbol": "غزنجان", "company": "شیر پاستوریزه پگاه زنجان", "industry": "محصولات لبنی"}, {"symbol": "شیمی بافت", "company": "پتروشیمی شیمی بافت", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "فکباتا", "company": "کنترل گاز اکباتان", "industry": "وسایل اندازه گیری غیر از کنترل صنعتی"}, {"symbol": "منارا", "company": "ایران نارا", "industry": "سخت افزار و تجهیزات"}, {"symbol": "داکسیر", "company": "پخش دارویی اکسیر", "industry": "دارویی"}, {"symbol": "مدار", "company": "س. مدیریت سرمایه مدار", "industry": "سرمایه گذاری"}, {"symbol": "نمخمل", "company": "مخمل و ابریشم کاشان", "industry": "نساجی"}, {"symbol": "پیمان", "company": "پیمان غرب", "industry": "خدمات رفاهی-برق "}, {"symbol": "امیران", "company": "گروه سرمایه گذاری امیر", "industry": "سرمایه گذاری"}, {"symbol": "ستبرا", "company": "صنعتی و معدنی ستبران", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "سحرخیز", "company": "کشاورزی صنعتی زعفران سحرخیز", "industry": "سایر محصولات غذایی"}, {"symbol": "دانایان", "company": "گروه مالی دانایان", "industry": "سرمایه گذاری"}, {"symbol": "قطران", "company": "پالایش قطران ذغالسنگ", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "زسپاها", "company": "کشت و صنعت امداد سپاهان گلدشت", "industry": "محصولات کشاورزی و دامپروری"}, {"symbol": "فخالص", "company": "خالص سازان روی زنجان", "industry": "تولید فلزات گرانبهای غیراهن"}, {"symbol": "خفرمان", "company": "فرمان خودرو سپاهان", "industry": "قطعات خودرو"}, {"symbol": "شرازی", "company": "شیمیایی رازی", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "پخش اول", "company": "گلپخش اول", "industry": "خرده فروشی،باستثنای وسایل نقلیه موتوری"}, {"symbol": "تک نیرو", "company": "تعاونی کارکنان نیروگاه یزد", "industry": "خدمات رفاهی-برق "}, {"symbol": "سفید", "company": "سیمان سفید شرق", "industry": "سیمان، اهک و گچ"}, {"symbol": "فردوس", "company": "گسترش کشاورزی و دامپروری فردوس", "industry": "سرمایه گذاری"}, {"symbol": "فتوان", "company": "فولاد توان آور آسیا", "industry": "آهن و فولاد"}, {"symbol": "آب", "company": "مهندسی توسعه آب آسیا", "industry": "-"}, {"symbol": "آتیه", "company": "آتیه کارکنان صنعت برق خراسان", "industry": "سرمایه گذاری"}, {"symbol": "بهداش", "company": "شیمیایی بهداش", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "کمین", "company": "ثمین بیهق", "industry": "کانی های فلزی"}, {"symbol": "سیمکات", "company": "سیم و کابل تبریز", "industry": "تجهیزات صنعتی"}, {"symbol": "الکل", "company": "خمیرمایه و الکل رازی", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "وشستان", "company": "سرمایه گذاری تجاری شستان", "industry": "سرمایه گذاری"}, {"symbol": "سمهریز", "company": "صنعتی معدنی سیمان تجارت مهریز", "industry": "سیمان، اهک و گچ"}, {"symbol": "سناوند", "company": "صنایع سیمان نهاوند", "industry": "سیمان، اهک و گچ"}, {"symbol": "ابنیه", "company": "ابنیه وساختمان پدیده شاندیز", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "وسپاهان", "company": "سرمایه گذاری پویندگان سپاهان", "industry": "سرمایه گذاری"}, {"symbol": "وسرمایه", "company": "سرمایه گذاری دنیای سرمایه", "industry": "سرمایه گذاری"}, {"symbol": "خگلپا", "company": "فنرسازی زر گلپایگان", "industry": "قطعات خودرو"}, {"symbol": "فبیستون", "company": "مجتمع ذوب آهن بیستون", "industry": "آهن و فولاد"}, {"symbol": "شنامی", "company": "رسام پلیمر نامی", "industry": "مواد شیمیایی-متنوع"}, {"symbol": "احیا", "company": "احیا استیل فولاد بافت", "industry": "آهن و فولاد"}, {"symbol": "برق پرند", "company": "تولید برق پرند مپنا", "industry": "خدمات رفاهی-برق "}, {"symbol": "ورسا", "company": "گروه سرمایه گذاری رفاه اندیش", "industry": "سرمایه گذاری"}, {"symbol": "بهمن", "company": "بهمن موتور", "industry": "خودرو"}, {"symbol": "مایکت", "company": "هوشمند گستر هوتن پارس", "industry": "نرم افزار و خدمات"}, {"symbol": "گلیران", "company": "توسعه اسفدان شرق", "industry": "سایر محصولات غذایی"}, {"symbol": "فسیکو", "company": "فروسیلیس غرب پارس", "industry": "آهن و فولاد"}, {"symbol": "یکتانت", "company": "نوآوران یکتانت", "industry": "تبليغات و بازار پژوهی"}, {"symbol": "فپردیس", "company": "صنعت تجارت پردیس آذربایجان", "industry": "آهن و فولاد"}, {"symbol": "بیمیسکو", "company": "معدنی و صنعت آهن و فولاد بافق", "industry": "آهن و فولاد"}, {"symbol": "ثشهر", "company": "مدیریت عمران و توسعه شهر آتیه", "industry": "انبوه سازی، املاک و مستغلات"}, {"symbol": "ختوسعه", "company": "توسعه صنعتی تراکتورسازی ایران", "industry": "قطعات خودرو"}, {"symbol": "سلیمان", "company": "تولیدی و صنعتی رسول اصفهان", "industry": "نساجی"}, {"symbol": "آرسیس", "company": "مبنا داده آرین سیستم", "industry": "نرم افزار و خدمات"}, {"symbol": "فکور", "company": "مهندسی فکورصنعت تهران", "industry": "فعالیت مهندسی"}, {"symbol": "گلبهار", "company": "صنایع بسته بندی ارمغان گلبهار", "industry": "محصولات فلزی"}, {"symbol": "دلوسه", "company": "آسیاب طلایی", "industry": "سایر محصولات غذایی"}, {"symbol": "فیروز", "company": "کاشی فیروزه مشهد", "industry": "کاشی و سرامیک"}, {"symbol": "آلپاکو", "company": "آلومینیوم پارس اکسید کسرا", "industry": "سایر محصولات کانی غیرفلزی"}, {"symbol": "تخاور", "company": "تامین سرمایه طاووس خاورمیانه", "industry": "فعالیتهای مرتبط با اوراق بهادار"}, {"symbol": "پتروامید", "company": "پترو امید آسیا", "industry": "حفاری"}];
+const MAX_PICK = 150;
+
+let state = { name: null, selected: new Set(), search: "", industry: "" };
+
+function toFa(n){
+  const map = {"0":"۰","1":"۱","2":"۲","3":"۳","4":"۴","5":"۵","6":"۶","7":"۷","8":"۸","9":"۹"};
+  return String(n).replace(/[0-9]/g, d => map[d]);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function getLocal(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+function setLocal(key, val){ try{ localStorage.setItem(key, val); }catch(e){} }
+
+async function init(){
+  populateIndustries();
+  renderList();
+
+  const savedName = getLocal("my_name");
+  if(savedName){
+    state.name = savedName;
+    document.getElementById("gateOverlay").style.display = "none";
+    showWhoami();
+    const draft = getLocal("my_selection_" + savedName);
+    if(draft){ try{ JSON.parse(draft).forEach(s => state.selected.add(s)); }catch(e){} }
+    updateCounter(); renderChips(); renderList();
+    checkExistingVote();
+  }
+
+  document.getElementById("gateSubmit").onclick = submitGate;
+  document.getElementById("gateNameInput").addEventListener("keydown", e => { if(e.key === "Enter") submitGate(); });
+  document.getElementById("changeNameBtn").onclick = () => {
+    document.getElementById("gateOverlay").style.display = "flex";
+    document.getElementById("gateNameInput").value = state.name || "";
+  };
+  document.getElementById("searchInput").addEventListener("input", e => { state.search = e.target.value.trim(); renderList(); });
+  document.getElementById("industrySelect").addEventListener("change", e => { state.industry = e.target.value; renderList(); });
+  document.getElementById("submitBtn").onclick = submitVote;
+  document.getElementById("selectedToggle").onclick = () => {
+    const cl = document.getElementById("chipList");
+    cl.style.display = cl.style.display === "none" ? "flex" : "none";
+  };
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+  document.getElementById("refreshResultsBtn").onclick = () => renderResults();
+  document.getElementById("refreshIndividualBtn").onclick = () => renderIndividual();
+}
+
+async function submitGate(){
+  const val = document.getElementById("gateNameInput").value.trim();
+  if(val.length < 2){
+    document.getElementById("gateError").textContent = "لطفاً نام معتبر وارد کنید.";
+    return;
+  }
+  state.name = val;
+  setLocal("my_name", val);
+  document.getElementById("gateOverlay").style.display = "none";
+  showWhoami();
+  state.selected = new Set();
+  const draft = getLocal("my_selection_" + val);
+  if(draft){ try{ JSON.parse(draft).forEach(s => state.selected.add(s)); }catch(e){} }
+  updateCounter(); renderChips(); renderList();
+  checkExistingVote();
+}
+
+function showWhoami(){
+  document.getElementById("whoamiBox").style.display = "flex";
+  document.getElementById("whoamiName").textContent = state.name;
+}
+
+function populateIndustries(){
+  const counts = {};
+  DATA.forEach(d => { counts[d.industry] = (counts[d.industry]||0)+1; });
+  const list = Object.keys(counts).sort((a,b)=>a.localeCompare(b,'fa'));
+  const sel = document.getElementById("industrySelect");
+  list.forEach(ind => {
+    const opt = document.createElement("option");
+    opt.value = ind;
+    opt.textContent = ind + " (" + toFa(counts[ind]) + ")";
+    sel.appendChild(opt);
+  });
+}
+
+function getFiltered(){
+  let arr = DATA;
+  if(state.industry){ arr = arr.filter(d => d.industry === state.industry); }
+  if(state.search){
+    const q = state.search.toLowerCase();
+    arr = arr.filter(d => d.symbol.includes(state.search) || d.company.includes(state.search) || d.symbol.toLowerCase().includes(q) || d.company.toLowerCase().includes(q));
+  }
+  return arr;
+}
+
+function renderList(){
+  const arr = getFiltered();
+  const scroll = document.getElementById("listScroll");
+  if(arr.length === 0){
+    scroll.innerHTML = '<div class="empty-state">نمادی با این مشخصات پیدا نشد.</div>';
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  arr.forEach(d => {
+    const row = document.createElement("div");
+    row.className = "row-item" + (state.selected.has(d.symbol) ? " checked" : "");
+    row.innerHTML = `
+      <input type="checkbox" ${state.selected.has(d.symbol) ? "checked" : ""}>
+      <div class="sym-cell"><b>${escapeHtml(d.symbol)}</b><span class="comp">${escapeHtml(d.company)}</span></div>
+      <span class="industry-badge">${escapeHtml(d.industry)}</span>
+      <span></span>
+    `;
+    row.addEventListener("click", (e) => {
+      if(e.target.tagName !== "INPUT"){
+        const cb = row.querySelector("input"); cb.checked = !cb.checked;
+      }
+      toggleSymbol(d.symbol, row.querySelector("input").checked, row);
+    });
+    frag.appendChild(row);
+  });
+  scroll.innerHTML = "";
+  scroll.appendChild(frag);
+}
+
+function toggleSymbol(symbol, checked, rowEl){
+  if(!state.name){ document.getElementById("gateOverlay").style.display = "flex"; return; }
+  if(checked){
+    if(state.selected.size >= MAX_PICK){
+      alert("حداکثر " + toFa(MAX_PICK) + " نماد قابل انتخاب است. ابتدا یک نماد را از لیست انتخابی حذف کنید.");
+      rowEl.querySelector("input").checked = false;
+      return;
+    }
+    state.selected.add(symbol);
+    rowEl.classList.add("checked");
+  } else {
+    state.selected.delete(symbol);
+    rowEl.classList.remove("checked");
+  }
+  updateCounter(); renderChips(); saveDraft();
+}
+
+function updateCounter(){
+  const n = state.selected.size;
+  document.getElementById("countText").textContent = toFa(n) + " از " + toFa(MAX_PICK);
+  document.getElementById("gaugeLabel").textContent = toFa(n);
+  document.getElementById("selCountPill").textContent = toFa(n);
+  const circumference = 138.2;
+  const ratio = Math.min(n / MAX_PICK, 1);
+  const offset = circumference - ratio * circumference;
+  const arc = document.getElementById("gaugeArc");
+  arc.setAttribute("stroke-dashoffset", offset.toFixed(2));
+  arc.setAttribute("stroke", n >= MAX_PICK ? "#F0B429" : "#22D3AA");
+}
+
+function renderChips(){
+  const wrap = document.getElementById("selectedRow");
+  const list = document.getElementById("chipList");
+  if(state.selected.size === 0){ wrap.style.display = "none"; return; }
+  wrap.style.display = "block";
+  list.innerHTML = "";
+  Array.from(state.selected).forEach(sym => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.innerHTML = `<span>${escapeHtml(sym)}</span><button aria-label="حذف">✕</button>`;
+    chip.querySelector("button").onclick = () => {
+      state.selected.delete(sym);
+      updateCounter(); renderChips(); renderList(); saveDraft();
+    };
+    list.appendChild(chip);
+  });
+}
+
+let draftTimeout = null;
+function saveDraft(){
+  if(!state.name) return;
+  clearTimeout(draftTimeout);
+  draftTimeout = setTimeout(() => {
+    setLocal("my_selection_" + state.name, JSON.stringify(Array.from(state.selected)));
+  }, 400);
+}
+
+async function checkExistingVote(){
+  if(!db) return;
+  const msg = document.getElementById("submitMsg");
+  const btn = document.getElementById("submitBtn");
+  try{
+    const votes = await jbGetVotes();
+    if(votes[state.name]){
+      btn.textContent = "به‌روزرسانی رأی";
+      msg.textContent = "رأی قبلی شما در " + new Date(votes[state.name].submittedAt).toLocaleString("fa-IR") + " ثبت شده. با هر تغییری دوباره «به‌روزرسانی رأی» را بزنید.";
+      msg.className = "submit-msg";
+    }
+  }catch(e){ /* نادیده گرفته می‌شود */ }
+}
+
+async function submitVote(){
+  if(!state.name){ document.getElementById("gateOverlay").style.display = "flex"; return; }
+  if(state.selected.size === 0){ alert("لطفاً حداقل یک نماد انتخاب کنید."); return; }
+  if(!db){ alert("اتصال به دیتابیس تنظیم نشده است. راهنمای بالای صفحه را ببینید."); return; }
+  const btn = document.getElementById("submitBtn");
+  const msg = document.getElementById("submitMsg");
+  btn.disabled = true;
+  btn.textContent = "در حال ثبت…";
+  try{
+    await jbSaveVote(state.name, Array.from(state.selected));
+    btn.textContent = "به‌روزرسانی رأی";
+    msg.textContent = "✓ رأی شما با موفقیت ثبت شد (" + toFa(state.selected.size) + " نماد).";
+    msg.className = "submit-msg ok";
+  }catch(e){
+    msg.textContent = "خطا در ثبت رأی: " + (e.message || "لطفاً دوباره تلاش کنید.");
+    msg.className = "submit-msg err";
+    btn.textContent = "ثبت رأی";
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function switchTab(tab){
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-" + tab).classList.add("active");
+  if(tab === "results") renderResults();
+  if(tab === "individual") renderIndividual();
+}
+
+function computeAggregate(votes){
+  const counts = {};
+  Object.values(votes).forEach(v => (v.symbols||[]).forEach(sym => { counts[sym] = (counts[sym]||0)+1; }));
+  const lookup = {};
+  DATA.forEach(d => lookup[d.symbol] = d);
+  const ranked = Object.entries(counts)
+    .map(([symbol, count]) => ({ symbol, count, meta: lookup[symbol] || { company:"—", industry:"—" } }))
+    .sort((a,b) => b.count - a.count || a.symbol.localeCompare(b.symbol,'fa'));
+  ranked.forEach((r,i) => r.rank = i+1);
+  return ranked;
+}
+
+async function renderResults(){
+  const wrap = document.getElementById("resultsTableWrap");
+  if(!db){ wrap.innerHTML = '<div class="empty-hint">اتصال به دیتابیس تنظیم نشده است.</div>'; return; }
+  wrap.innerHTML = '<div class="empty-hint">در حال بارگذاری…</div>';
+  let votes;
+  try{ votes = await jbGetVotes(); }
+  catch(e){ wrap.innerHTML = '<div class="empty-hint">خطا در دریافت نتایج. دوباره تلاش کنید.</div>'; return; }
+
+  const ranked = computeAggregate(votes);
+  const voterCount = Object.keys(votes).length;
+  document.getElementById("statVoters").textContent = toFa(voterCount);
+  document.getElementById("statSymbols").textContent = toFa(ranked.length);
+  const threshold = ranked.length >= MAX_PICK ? ranked[MAX_PICK-1].count : (ranked.length ? ranked[ranked.length-1].count : 0);
+  document.getElementById("statTop").textContent = toFa(threshold);
+
+  if(ranked.length === 0){ wrap.innerHTML = '<div class="empty-hint">هنوز رأیی ثبت نشده است.</div>'; return; }
+  const maxCount = ranked[0].count;
+  let rows = ranked.map(r => `
+    <tr class="${r.rank <= MAX_PICK ? 'top150' : ''}">
+      <td><span class="rank-badge ${r.rank <= MAX_PICK ? 'top' : ''}">${toFa(r.rank)}</span></td>
+      <td><b>${escapeHtml(r.symbol)}</b></td>
+      <td>${escapeHtml(r.meta.company)}</td>
+      <td>${escapeHtml(r.meta.industry)}</td>
+      <td><div class="vote-bar-wrap"><span>${toFa(r.count)}</span><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${(r.count/maxCount*100).toFixed(0)}%"></div></div></div></td>
+    </tr>`).join("");
+  wrap.innerHTML = `<table class="results-table"><thead><tr><th>رتبه</th><th>نماد</th><th>شرکت</th><th>صنعت</th><th>تعداد رأی</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function renderIndividual(){
+  const list = document.getElementById("individualList");
+  if(!db){ list.innerHTML = '<div class="empty-hint">اتصال به دیتابیس تنظیم نشده است.</div>'; return; }
+  list.innerHTML = '<div class="empty-hint">در حال بارگذاری…</div>';
+  let votes;
+  try{ votes = await jbGetVotes(); }
+  catch(e){ list.innerHTML = '<div class="empty-hint">خطا در دریافت نتایج. دوباره تلاش کنید.</div>'; return; }
+
+  const ranked = computeAggregate(votes);
+  const topSet = new Set(ranked.slice(0, MAX_PICK).map(r => r.symbol));
+  const names = Object.keys(votes).sort((a,b) => a.localeCompare(b,'fa'));
+  if(names.length === 0){ list.innerHTML = '<div class="empty-hint">هنوز رأیی ثبت نشده است.</div>'; return; }
+  list.innerHTML = names.map(name => {
+    const v = votes[name];
+    const syms = v.symbols || [];
+    const inTop = syms.filter(s => topSet.has(s)).length;
+    const pct = syms.length ? Math.round(inTop / syms.length * 100) : 0;
+    const chips = syms.map(s => `<span class="vchip ${topSet.has(s) ? 'intop' : ''}">${escapeHtml(s)}</span>`).join("");
+    return `
+      <div class="voter-card">
+        <div class="voter-head">
+          <div>
+            <div class="name">${escapeHtml(name)}</div>
+            <div class="meta">${toFa(syms.length)} نماد درخواستی • ثبت در ${new Date(v.submittedAt).toLocaleString("fa-IR")}</div>
+          </div>
+          <div class="pct-pill ${pct >= 50 ? 'good' : ''}">${toFa(pct)}٪ در ۱۵۰ برتر</div>
+        </div>
+        <div class="voter-chips">${chips}</div>
+      </div>`;
+  }).join("");
+}
+
+init();
+</script>
+</body>
+</html>
