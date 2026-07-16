@@ -733,9 +733,9 @@ function renderResultsTable(){
   const maxWeighted = Math.max(...ranked.map(r => r.weightedCount), 1);
   const arrow = (key) => resultsState.sortKey === key ? (resultsState.sortDir === "asc" ? "▲" : "▼") : "▲▼";
   const cls = (key) => "sortable" + (resultsState.sortKey === key ? " active" : "");
-  let rows = arr.map(r => `
+  let rows = arr.map((r, i) => `
     <tr class="${r.rank <= MAX_PICK ? 'top150' : ''}">
-      <td><span class="rank-badge ${r.rank <= MAX_PICK ? 'top' : ''}">${toFa(r.rank)}</span></td>
+      <td><span class="rank-badge ${r.rank <= MAX_PICK ? 'top' : ''}">${toFa(i + 1)}</span></td>
       <td><b>${escapeHtml(r.symbol)}</b></td>
       <td>${escapeHtml(r.meta.company)}</td>
       <td>${escapeHtml(r.meta.industry)}</td>
