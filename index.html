@@ -76,6 +76,10 @@
   .list-header .sortable:hover{color:var(--text);}
   .list-header .sort-arrow{font-size:9px;opacity:.5;}
   .list-header .sortable.active .sort-arrow{opacity:1;color:var(--accent);}
+  table.results-table th.sortable{cursor:pointer;user-select:none;}
+  table.results-table th.sortable:hover{color:var(--text);}
+  table.results-table th.sortable .sort-arrow{font-size:9px;opacity:.5;margin-right:2px;}
+  table.results-table th.sortable.active .sort-arrow{opacity:1;color:var(--accent);}
   .list-scroll{max-height:560px;overflow-y:auto;}
   .row-item{display:grid;grid-template-columns:34px 1fr 1fr 110px auto;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--border);cursor:pointer;transition:background .1s;}
   .row-item:hover{background:var(--surface-2);}
@@ -132,6 +136,23 @@
   .refresh-row{display:flex;justify-content:flex-end;margin-bottom:10px;}
   .config-warning{background:#3A1F1F;border:1px solid var(--danger);color:#FFD9D9;border-radius:10px;padding:16px 18px;margin-bottom:18px;font-size:13px;line-height:2;}
   .config-warning code{background:#1E1010;padding:1px 6px;border-radius:4px;font-size:12px;}
+  .admin-voter-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .admin-voter-row:last-child{border-bottom:none;}
+  .admin-voter-row .name{font-size:13px;}
+  .admin-voter-row .weight-controls{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .admin-voter-row input[type=number]{
+    width:64px;background:var(--surface);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:6px 8px;font-size:13px;font-family:inherit;text-align:center;outline:none;
+  }
+  .admin-voter-row input[type=number]:focus{border-color:var(--accent);}
+  .admin-voter-row .save-btn{
+    background:var(--accent-dim);color:var(--accent);border:none;border-radius:7px;
+    padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .admin-voter-row .save-btn:hover{filter:brightness(1.1);}
+  .admin-voter-row .save-status{font-size:11px;color:var(--text-faint);min-width:50px;}
+  .admin-voter-row .save-status.ok{color:var(--accent);}
+  .admin-voter-row .save-status.err{color:var(--danger);}
   @media (max-width:640px){
     .list-header{display:none;}
     .row-item{grid-template-columns:24px 1fr 70px;grid-template-rows:auto auto;}
@@ -221,19 +242,27 @@
   </section>
 
   <section class="tab-panel" id="panel-results">
-    <div class="refresh-row"><button class="btn btn-ghost" id="refreshResultsBtn">↻ به‌روزرسانی نتایج</button></div>
+    <div class="refresh-row">
+      <button class="btn btn-ghost" id="adminBtn">⚙️ مدیریت ضرایب</button>
+      <button class="btn btn-ghost" id="refreshResultsBtn">↻ به‌روزرسانی نتایج</button>
+    </div>
     <div class="card">
       <h3>خلاصه نظرسنجی</h3>
-      <p class="sub">جمع رأی‌های ثبت‌شده توسط همه‌ی شرکت‌کنندگان، مرتب‌شده بر اساس تعداد درخواست</p>
+      <p class="sub">جمع رأی‌های ثبت‌شده توسط همه‌ی شرکت‌کنندگان (با احتساب ضریب هر فرد)</p>
       <div class="stat-grid">
         <div class="stat"><div class="n" id="statVoters">۰</div><div class="l">تعداد رأی‌دهندگان</div></div>
         <div class="stat"><div class="n" id="statSymbols">۰</div><div class="l">نمادهای دارای حداقل یک رأی</div></div>
-        <div class="stat"><div class="n" id="statTop">۰</div><div class="l">آستانه ورود به ۱۵۰ برتر (تعداد رأی)</div></div>
+        <div class="stat"><div class="n" id="statTop">۰</div><div class="l">آستانه ورود به ۱۵۰ برتر (مجموع وزن‌دار)</div></div>
       </div>
     </div>
     <div class="card">
+      <h3>تعداد رأی به تفکیک صنعت</h3>
+      <p class="sub">مجموع رأی خام و وزن‌دار در هر صنعت</p>
+      <div class="table-scroll" id="industrySummaryWrap"><div class="empty-hint">هنوز رأیی ثبت نشده است.</div></div>
+    </div>
+    <div class="card">
       <h3>رتبه‌بندی نمادها</h3>
-      <p class="sub">۱۵۰ نماد برتر با پس‌زمینه‌ی سبز مشخص شده‌اند</p>
+      <p class="sub">۱۵۰ نماد برتر (بر اساس مجموع وزن‌دار) با پس‌زمینه‌ی سبز مشخص شده‌اند — روی هدر ستون‌ها بزنید تا سورت شود</p>
       <div class="table-scroll" id="resultsTableWrap"><div class="empty-hint">هنوز رأیی ثبت نشده است.</div></div>
     </div>
   </section>
@@ -260,6 +289,23 @@
     <input type="text" id="gateNameInput" placeholder="مثلاً: علی محمدی" autocomplete="off">
     <div class="gate-error" id="gateError"></div>
     <button class="btn btn-block" id="gateSubmit">ورود و شروع</button>
+  </div>
+</div>
+
+<div class="gate-overlay" id="adminOverlay" style="display:none;">
+  <div class="gate-card" style="max-width:520px;text-align:right;">
+    <div style="text-align:center;">
+      <div class="brand-mark" style="margin:0 auto 16px;">⚙️</div>
+      <h2 style="text-align:center;">مدیریت ضرایب رأی‌دهندگان</h2>
+    </div>
+
+    <div id="adminListStep">
+      <p class="sub" style="margin-bottom:12px;">ضریب پیش‌فرض هر فرد ۱ است. برای بی‌اثرکردن رأی کسی، ضریب را ۰ بگذارید.</p>
+      <div id="adminVoterList" style="max-height:360px;overflow-y:auto;"></div>
+      <div class="gate-error" id="adminListError"></div>
+    </div>
+
+    <button class="link-btn" id="adminCloseBtn" style="display:block;margin:16px auto 0;">بستن</button>
   </div>
 </div>
 
@@ -291,6 +337,18 @@ async function jbSaveVote(name, symbols){
   if(!res.ok){
     const errBody = await res.json().catch(() => ({}));
     throw new Error(errBody.error || ("خطا در ثبت رأی (کد " + res.status + ")"));
+  }
+}
+
+async function jbSetWeight(name, weight){
+  const res = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ adminAction: "setWeight", name: name, weight: weight })
+  });
+  if(!res.ok){
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(errBody.error || ("خطا در ذخیره‌ی ضریب (کد " + res.status + ")"));
   }
 }
 
@@ -357,6 +415,8 @@ async function init(){
   document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
   document.getElementById("refreshResultsBtn").onclick = () => renderResults();
   document.getElementById("refreshIndividualBtn").onclick = () => renderIndividual();
+  document.getElementById("adminBtn").onclick = openAdminPanel;
+  document.getElementById("adminCloseBtn").onclick = closeAdminPanel;
 }
 
 async function submitGate(){
@@ -511,6 +571,60 @@ function saveDraft(){
   }, 400);
 }
 
+/* ---------- admin panel ---------- */
+
+function openAdminPanel(){
+  document.getElementById("adminOverlay").style.display = "flex";
+  loadAdminVoterList();
+}
+function closeAdminPanel(){
+  document.getElementById("adminOverlay").style.display = "none";
+}
+
+async function loadAdminVoterList(){
+  const listBox = document.getElementById("adminVoterList");
+  const errBox = document.getElementById("adminListError");
+  listBox.innerHTML = '<div class="empty-hint">در حال بارگذاری…</div>';
+  let votes;
+  try{ votes = await jbGetVotes(); }
+  catch(e){ listBox.innerHTML = ""; errBox.textContent = "خطا در دریافت لیست رأی‌دهندگان."; return; }
+
+  const names = Object.keys(votes).sort((a,b) => a.localeCompare(b,'fa'));
+  if(names.length === 0){ listBox.innerHTML = '<div class="empty-hint">هنوز رأیی ثبت نشده است.</div>'; return; }
+
+  listBox.innerHTML = "";
+  names.forEach(name => {
+    const currentWeight = getWeight(votes[name]);
+    const row = document.createElement("div");
+    row.className = "admin-voter-row";
+    row.innerHTML = `
+      <span class="name">${escapeHtml(name)}</span>
+      <div class="weight-controls">
+        <span class="save-status"></span>
+        <input type="number" step="0.1" min="0" max="100" value="${currentWeight}">
+        <button class="save-btn">ذخیره</button>
+      </div>`;
+    const input = row.querySelector("input");
+    const status = row.querySelector(".save-status");
+    row.querySelector(".save-btn").onclick = async () => {
+      const w = parseFloat(input.value);
+      if(isNaN(w) || w < 0 || w > 100){
+        status.textContent = "عدد نامعتبر"; status.className = "save-status err";
+        return;
+      }
+      status.textContent = "در حال ذخیره…"; status.className = "save-status";
+      try{
+        await jbSetWeight(name, w);
+        status.textContent = "✓ ذخیره شد"; status.className = "save-status ok";
+      }catch(e){
+        status.textContent = e.message || "خطا"; status.className = "save-status err";
+      }
+    };
+    listBox.appendChild(row);
+  });
+}
+
+/* ---------- existing-vote check ---------- */
 async function checkExistingVote(){
   if(!db) return;
   const msg = document.getElementById("submitMsg");
@@ -558,16 +672,113 @@ function switchTab(tab){
   if(tab === "individual") renderIndividual();
 }
 
+function getWeight(voteRecord){
+  const w = voteRecord && voteRecord.weight;
+  return (typeof w === "number" && isFinite(w)) ? w : 1;
+}
+
 function computeAggregate(votes){
-  const counts = {};
-  Object.values(votes).forEach(v => (v.symbols||[]).forEach(sym => { counts[sym] = (counts[sym]||0)+1; }));
+  const raw = {};
+  const weighted = {};
+  Object.values(votes).forEach(v => {
+    const w = getWeight(v);
+    (v.symbols||[]).forEach(sym => {
+      raw[sym] = (raw[sym]||0) + 1;
+      weighted[sym] = (weighted[sym]||0) + w;
+    });
+  });
   const lookup = {};
   DATA.forEach(d => lookup[d.symbol] = d);
-  const ranked = Object.entries(counts)
-    .map(([symbol, count]) => ({ symbol, count, meta: lookup[symbol] || { company:"—", industry:"—" } }))
-    .sort((a,b) => b.count - a.count || a.symbol.localeCompare(b.symbol,'fa'));
+  const ranked = Object.keys(raw)
+    .map(symbol => ({ symbol, count: raw[symbol], weightedCount: weighted[symbol], meta: lookup[symbol] || { company:"—", industry:"—" } }))
+    .sort((a,b) => b.weightedCount - a.weightedCount || b.count - a.count || a.symbol.localeCompare(b.symbol,'fa'));
   ranked.forEach((r,i) => r.rank = i+1);
   return ranked;
+}
+
+let resultsState = { ranked: [], sortKey: null, sortDir: "desc" };
+
+function computeIndustrySummary(ranked){
+  const byInd = {};
+  ranked.forEach(r => {
+    const ind = (r.meta && r.meta.industry) || "سایر";
+    if(!byInd[ind]) byInd[ind] = { industry: ind, symbolCount: 0, rawSum: 0, weightedSum: 0 };
+    byInd[ind].symbolCount += 1;
+    byInd[ind].rawSum += r.count;
+    byInd[ind].weightedSum += r.weightedCount;
+  });
+  return Object.values(byInd).sort((a,b) => b.weightedSum - a.weightedSum);
+}
+
+function sortResultsRanked(){
+  const arr = resultsState.ranked.slice();
+  if(!resultsState.sortKey) return arr; // ترتیب پیش‌فرض: رتبه (بر اساس مجموع وزن‌دار)
+  arr.sort((a,b) => {
+    let av, bv;
+    if(resultsState.sortKey === "symbol"){ av = a.symbol; bv = b.symbol; }
+    else if(resultsState.sortKey === "industry"){ av = a.meta.industry||""; bv = b.meta.industry||""; }
+    else if(resultsState.sortKey === "count"){ av = a.count; bv = b.count; }
+    else if(resultsState.sortKey === "weightedCount"){ av = a.weightedCount; bv = b.weightedCount; }
+    let cmp = (typeof av === "number") ? av - bv : String(av).localeCompare(String(bv), 'fa');
+    return resultsState.sortDir === "asc" ? cmp : -cmp;
+  });
+  return arr;
+}
+
+function renderResultsTable(){
+  const wrap = document.getElementById("resultsTableWrap");
+  const ranked = resultsState.ranked;
+  if(ranked.length === 0){ wrap.innerHTML = '<div class="empty-hint">هنوز رأیی ثبت نشده است.</div>'; return; }
+  const arr = sortResultsRanked();
+  const maxWeighted = Math.max(...ranked.map(r => r.weightedCount), 1);
+  const arrow = (key) => resultsState.sortKey === key ? (resultsState.sortDir === "asc" ? "▲" : "▼") : "▲▼";
+  const cls = (key) => "sortable" + (resultsState.sortKey === key ? " active" : "");
+  let rows = arr.map(r => `
+    <tr class="${r.rank <= MAX_PICK ? 'top150' : ''}">
+      <td><span class="rank-badge ${r.rank <= MAX_PICK ? 'top' : ''}">${toFa(r.rank)}</span></td>
+      <td><b>${escapeHtml(r.symbol)}</b></td>
+      <td>${escapeHtml(r.meta.company)}</td>
+      <td>${escapeHtml(r.meta.industry)}</td>
+      <td>${toFa(r.count)}</td>
+      <td>
+        <div class="vote-bar-wrap"><span>${toFa(Math.round(r.weightedCount*100)/100)}</span><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${(r.weightedCount/maxWeighted*100).toFixed(0)}%"></div></div></div>
+      </td>
+    </tr>`).join("");
+  wrap.innerHTML = `<table class="results-table">
+    <thead><tr>
+      <th>رتبه</th>
+      <th class="${cls('symbol')}" data-sort="symbol">نماد <span class="sort-arrow">${arrow('symbol')}</span></th>
+      <th>شرکت</th>
+      <th class="${cls('industry')}" data-sort="industry">صنعت <span class="sort-arrow">${arrow('industry')}</span></th>
+      <th class="${cls('count')}" data-sort="count">تعداد رأی خام <span class="sort-arrow">${arrow('count')}</span></th>
+      <th class="${cls('weightedCount')}" data-sort="weightedCount">مجموع وزن‌دار <span class="sort-arrow">${arrow('weightedCount')}</span></th>
+    </tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  wrap.querySelectorAll("th.sortable").forEach(th => {
+    th.style.cursor = "pointer";
+    th.addEventListener("click", () => {
+      const key = th.dataset.sort;
+      if(resultsState.sortKey === key){ resultsState.sortDir = resultsState.sortDir === "asc" ? "desc" : "asc"; }
+      else { resultsState.sortKey = key; resultsState.sortDir = "desc"; }
+      renderResultsTable();
+    });
+  });
+}
+
+function renderIndustrySummary(ranked){
+  const wrap = document.getElementById("industrySummaryWrap");
+  const summary = computeIndustrySummary(ranked);
+  if(summary.length === 0){ wrap.innerHTML = '<div class="empty-hint">هنوز رأیی ثبت نشده است.</div>'; return; }
+  const rows = summary.map(s => `
+    <tr>
+      <td>${escapeHtml(s.industry)}</td>
+      <td>${toFa(s.symbolCount)}</td>
+      <td>${toFa(s.rawSum)}</td>
+      <td>${toFa(Math.round(s.weightedSum*100)/100)}</td>
+    </tr>`).join("");
+  wrap.innerHTML = `<table class="results-table">
+    <thead><tr><th>صنعت</th><th>تعداد نماد دارای رأی</th><th>مجموع رأی خام</th><th>مجموع وزن‌دار</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
 }
 
 async function renderResults(){
@@ -579,23 +790,16 @@ async function renderResults(){
   catch(e){ wrap.innerHTML = '<div class="empty-hint">خطا در دریافت نتایج. دوباره تلاش کنید.</div>'; return; }
 
   const ranked = computeAggregate(votes);
+  resultsState.ranked = ranked;
+  resultsState.sortKey = null;
   const voterCount = Object.keys(votes).length;
   document.getElementById("statVoters").textContent = toFa(voterCount);
   document.getElementById("statSymbols").textContent = toFa(ranked.length);
-  const threshold = ranked.length >= MAX_PICK ? ranked[MAX_PICK-1].count : (ranked.length ? ranked[ranked.length-1].count : 0);
+  const threshold = ranked.length >= MAX_PICK ? Math.round(ranked[MAX_PICK-1].weightedCount*100)/100 : (ranked.length ? Math.round(ranked[ranked.length-1].weightedCount*100)/100 : 0);
   document.getElementById("statTop").textContent = toFa(threshold);
 
-  if(ranked.length === 0){ wrap.innerHTML = '<div class="empty-hint">هنوز رأیی ثبت نشده است.</div>'; return; }
-  const maxCount = ranked[0].count;
-  let rows = ranked.map(r => `
-    <tr class="${r.rank <= MAX_PICK ? 'top150' : ''}">
-      <td><span class="rank-badge ${r.rank <= MAX_PICK ? 'top' : ''}">${toFa(r.rank)}</span></td>
-      <td><b>${escapeHtml(r.symbol)}</b></td>
-      <td>${escapeHtml(r.meta.company)}</td>
-      <td>${escapeHtml(r.meta.industry)}</td>
-      <td><div class="vote-bar-wrap"><span>${toFa(r.count)}</span><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${(r.count/maxCount*100).toFixed(0)}%"></div></div></div></td>
-    </tr>`).join("");
-  wrap.innerHTML = `<table class="results-table"><thead><tr><th>رتبه</th><th>نماد</th><th>شرکت</th><th>صنعت</th><th>تعداد رأی</th></tr></thead><tbody>${rows}</tbody></table>`;
+  renderIndustrySummary(ranked);
+  renderResultsTable();
 }
 
 async function renderIndividual(){
@@ -611,6 +815,8 @@ async function renderIndividual(){
 
   const ranked = computeAggregate(votes);
   const topSet = new Set(ranked.slice(0, MAX_PICK).map(r => r.symbol));
+  const rankedLookup = {};
+  ranked.forEach(r => rankedLookup[r.symbol] = r);
   const lookup = {};
   DATA.forEach(d => lookup[d.symbol] = d);
 
@@ -629,14 +835,18 @@ async function renderIndividual(){
 
   let rows = "";
   industries.forEach(ind => {
-    rows += `<tr class="industry-group"><td colspan="${names.length + 1}">${escapeHtml(ind)} (${toFa(byIndustry[ind].length)})</td></tr>`;
+    const indRaw = byIndustry[ind].reduce((s,sym) => s + (rankedLookup[sym] ? rankedLookup[sym].count : 0), 0);
+    const indWeighted = byIndustry[ind].reduce((s,sym) => s + (rankedLookup[sym] ? rankedLookup[sym].weightedCount : 0), 0);
+    rows += `<tr class="industry-group"><td colspan="${names.length + 1}">${escapeHtml(ind)} (${toFa(byIndustry[ind].length)} نماد) — جمع خام: ${toFa(indRaw)} | جمع وزن‌دار: ${toFa(Math.round(indWeighted*100)/100)}</td><td colspan="2"></td></tr>`;
     byIndustry[ind].forEach(sym => {
       const inTop = topSet.has(sym);
+      const r = rankedLookup[sym];
       let cells = `<td class="sym-col ${inTop ? 'top150' : ''}">${escapeHtml(sym)}</td>`;
       names.forEach(n => {
         const has = (votes[n].symbols || []).includes(sym);
         cells += `<td class="mark-cell">${has ? "✓" : ""}</td>`;
       });
+      cells += `<td class="mark-cell">${toFa(r ? r.count : 0)}</td><td class="mark-cell">${toFa(r ? Math.round(r.weightedCount*100)/100 : 0)}</td>`;
       rows += `<tr>${cells}</tr>`;
     });
   });
@@ -644,7 +854,7 @@ async function renderIndividual(){
   const headerCells = names.map(n => `<th class="name-col">${escapeHtml(n)}</th>`).join("");
   wrap.innerHTML = `
     <table class="matrix-table">
-      <thead><tr><th>نماد</th>${headerCells}</tr></thead>
+      <thead><tr><th>نماد</th>${headerCells}<th>تعداد خام</th><th>مجموع وزن‌دار</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
